@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Logging.fs" />
+    <Compile Include="SimpleQuery.fs" />
+    <Compile Include="InteractiveClient.fs" />
+    <Compile Include="McpTools.fs" />
+    <Compile Include="HooksAndPermissions.fs" />
+    <Compile Include="HumanInTheLoop.fs" />
+    <Compile Include="AskUserTool.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\ClaudeAgentSdk\ClaudeAgentSdk.fsproj" />
+  </ItemGroup>
+
+</Project>

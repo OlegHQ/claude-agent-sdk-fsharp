@@ -1,0 +1,976 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+<assembly><name>ClaudeAgentSdk</name></assembly>
+<members>
+<member name="T:ClaudeAgentSdk.ParsedLine">
+<summary>
+ Represents either a regular message or a control protocol message
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Json.Encode.sandboxSettings(ClaudeAgentSdk.SandboxSettings)">
+<summary>
+ Encode SandboxSettings
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Json.Encode.sandboxIgnoreViolations(ClaudeAgentSdk.SandboxIgnoreViolations)">
+<summary>
+ Encode SandboxIgnoreViolations
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Json.Encode.sandboxNetworkConfig(ClaudeAgentSdk.SandboxNetworkConfig)">
+<summary>
+ Encode SandboxNetworkConfig
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Json.Encode.settingSource(ClaudeAgentSdk.SettingSource)">
+<summary>
+ Encode SettingSource
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Json.Encode.agentDefinition(ClaudeAgentSdk.AgentDefinition)">
+<summary>
+ Encode AgentDefinition
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Json.Encode.agentModel(ClaudeAgentSdk.AgentModel)">
+<summary>
+ Encode AgentModel
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Json.Encode.hookEvent(ClaudeAgentSdk.HookEvent)">
+<summary>
+ Encode HookEvent
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Json.Encode.schema(ClaudeAgentSdk.Schema)">
+<summary>
+ Encode Schema to JSON Schema
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Json.Encode.controlResponseError(System.String,System.String)">
+<summary>
+ Encode a control response (error)
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Json.Encode.controlResponseSuccess(System.String,Microsoft.FSharp.Core.FSharpOption{Newtonsoft.Json.Linq.JToken})">
+<summary>
+ Encode a control response (success)
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Json.Encode.controlRequest(System.String,System.String,Microsoft.FSharp.Collections.FSharpList{System.Tuple{System.String,Newtonsoft.Json.Linq.JToken}})">
+<summary>
+ Encode a control request
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Json.Encode.hookOutput(ClaudeAgentSdk.HookOutput)">
+<summary>
+ Encode HookOutput for control response
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Json.Encode.permissionResult(ClaudeAgentSdk.PermissionResult)">
+<summary>
+ Encode PermissionResult for control response
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Json.Encode.permissionUpdate(ClaudeAgentSdk.PermissionUpdate)">
+<summary>
+ Encode PermissionUpdate
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Json.Encode.permissionRuleValue(ClaudeAgentSdk.PermissionRuleValue)">
+<summary>
+ Encode PermissionRuleValue
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Json.Encode.permissionUpdateType(ClaudeAgentSdk.PermissionUpdateType)">
+<summary>
+ Encode PermissionUpdateType
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Json.Encode.permissionUpdateDestination(ClaudeAgentSdk.PermissionUpdateDestination)">
+<summary>
+ Encode PermissionUpdateDestination
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Json.Encode.permissionMode(ClaudeAgentSdk.PermissionMode)">
+<summary>
+ Encode PermissionMode
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Json.Encode.permissionBehavior(ClaudeAgentSdk.PermissionBehavior)">
+<summary>
+ Encode PermissionBehavior
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Json.Encode.userMessage(System.String,System.String)">
+<summary>
+ Encode a user message for sending to CLI
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Json.Decode.parsedLine">
+<summary>
+ Decode a line as either Message, ControlRequest, or ControlResponse
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Json.Decode.controlResponse">
+<summary>
+ Decode ControlResponse
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Json.Decode.controlRequest">
+<summary>
+ Decode ControlRequest
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Json.Decode.hookInput">
+<summary>
+ Decode HookInput (discriminated by hook_event_name)
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Json.Decode.hookEvent">
+<summary>
+ Decode HookEvent
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Json.Decode.permissionUpdate">
+<summary>
+ Decode PermissionUpdate
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Json.Decode.permissionUpdateType">
+<summary>
+ Decode PermissionUpdateType
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Json.Decode.permissionRuleValue">
+<summary>
+ Decode PermissionRuleValue
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Json.Decode.permissionUpdateDestination">
+<summary>
+ Decode PermissionUpdateDestination
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Json.Decode.permissionMode">
+<summary>
+ Decode PermissionMode
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Json.Decode.permissionBehavior">
+<summary>
+ Decode PermissionBehavior
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Json.Decode.message">
+<summary>
+ Decode Message (discriminated by &quot;type&quot; field)
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Json.Decode.streamEvent">
+<summary>
+ Decode StreamEvent
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Json.Decode.resultMessage">
+<summary>
+ Decode ResultMessage
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Json.Decode.systemMessage">
+<summary>
+ Decode SystemMessage
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Json.Decode.assistantMessage">
+<summary>
+ Decode AssistantMessage
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Json.Decode.userMessage">
+<summary>
+ Decode UserMessage
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Json.Decode.userMessageContent">
+<summary>
+ Decode UserMessage content (can be list of blocks or string)
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Json.Decode.assistantMessageError">
+<summary>
+ Decode assistant message error
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Json.Decode.contentBlock">
+<summary>
+ Decode a ContentBlock from JSON
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Transport.endInput(ClaudeAgentSdk.Connection)">
+<summary>
+ End stdin (signal EOF without closing)
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Transport.close(ClaudeAgentSdk.Connection)">
+<summary>
+ Close the connection
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Transport.readWithBuffer(ClaudeAgentSdk.Connection,Microsoft.FSharp.Core.FSharpOption{System.Int32})">
+<summary>
+ Read lines with JSON buffering (handles multi-line JSON)
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Transport.read(ClaudeAgentSdk.Connection)">
+<summary>
+ Read lines from stdout as a TaskSeq
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Transport.write(System.String,ClaudeAgentSdk.Connection)">
+<summary>
+ Write a line to the connection&apos;s stdin
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Transport.spawn(System.String,Microsoft.FSharp.Collections.FSharpList{System.String},Microsoft.FSharp.Collections.FSharpMap{System.String,System.String},Microsoft.FSharp.Core.FSharpOption{System.String})">
+<summary>
+ Spawn a subprocess and return a Connection
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Transport.buildArgs(ClaudeAgentSdk.Options,System.Boolean)">
+<summary>
+ Build CLI arguments from Options
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Transport.findCli(Microsoft.FSharp.Core.FSharpOption{System.String})">
+<summary>
+ Find the Claude CLI binary
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Parser.tryParseMessage(System.String)">
+<summary>
+ Try to parse a JSON line as a Message, returning None if it fails
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Parser.tryParseLine(System.String)">
+<summary>
+ Try to parse a JSON line, returning None if it fails
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Parser.parseMessage(System.String)">
+<summary>
+ Parse a JSON line into a Message (ignores control protocol messages)
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Parser.parseLine(System.String)">
+<summary>
+ Parse a JSON line into a ParsedLine (Message, ControlRequest, or ControlResponse)
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Hooks.suppressOutput(ClaudeAgentSdk.HookOutput)">
+<summary>
+ Suppress output in a hook response
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Hooks.withSystemMessage(System.String,ClaudeAgentSdk.HookOutput)">
+<summary>
+ Create a hook response with a system message
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Hooks.userPromptSubmitResponse(Microsoft.FSharp.Core.FSharpOption{System.String})">
+<summary>
+ Create a user prompt submit hook response with additional context
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Hooks.postToolUseResponse(Microsoft.FSharp.Core.FSharpOption{System.String})">
+<summary>
+ Create a post-tool-use hook response with additional context
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Hooks.preToolUseResponse(ClaudeAgentSdk.PermissionBehavior,Microsoft.FSharp.Core.FSharpOption{System.String})">
+<summary>
+ Create a pre-tool-use hook response with permission decision
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Hooks.asyncHook(Microsoft.FSharp.Core.FSharpOption{System.Int32})">
+<summary>
+ Create an async hook response (run in background)
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Hooks.blockHook(System.String)">
+<summary>
+ Create a block response (stop the operation)
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Hooks.continueHook">
+<summary>
+ Create a continue response (allow the operation to proceed)
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Hooks.getCwd(ClaudeAgentSdk.HookInput)">
+<summary>
+ Get current working directory from any hook input
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Hooks.getTranscriptPath(ClaudeAgentSdk.HookInput)">
+<summary>
+ Get transcript path from any hook input
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Hooks.getSessionId(ClaudeAgentSdk.HookInput)">
+<summary>
+ Get session ID from any hook input
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Hooks.withTimeout(System.Double,ClaudeAgentSdk.HookMatcher)">
+<summary>
+ Add timeout to a hook matcher
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Hooks.matchTool(System.String,Microsoft.FSharp.Collections.FSharpList{Microsoft.FSharp.Core.FSharpFunc{ClaudeAgentSdk.HookInput,Microsoft.FSharp.Core.FSharpFunc{Microsoft.FSharp.Core.FSharpOption{System.String},System.Threading.Tasks.Task{ClaudeAgentSdk.HookOutput}}}})">
+<summary>
+ Create a hook matcher for specific tool pattern
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Hooks.matchAll(Microsoft.FSharp.Collections.FSharpList{Microsoft.FSharp.Core.FSharpFunc{ClaudeAgentSdk.HookInput,Microsoft.FSharp.Core.FSharpFunc{Microsoft.FSharp.Core.FSharpOption{System.String},System.Threading.Tasks.Task{ClaudeAgentSdk.HookOutput}}}})">
+<summary>
+ Create a hook matcher for all tools
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Hooks.buildHookCallbacks(Microsoft.FSharp.Collections.FSharpMap{ClaudeAgentSdk.HookEvent,Microsoft.FSharp.Collections.FSharpList{ClaudeAgentSdk.HookMatcher}})">
+<summary>
+ Build hook callback map from hook matchers for initialization
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Mcp.tryGetStringList(System.String,Newtonsoft.Json.Linq.JToken)">
+<summary>
+ Get an optional string list field from tool input
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Mcp.getStringList(System.String,Newtonsoft.Json.Linq.JToken)">
+<summary>
+ Get a required string list field from tool input
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Mcp.tryGetBool(System.String,Newtonsoft.Json.Linq.JToken)">
+<summary>
+ Get an optional bool field from tool input
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Mcp.getBool(System.String,Newtonsoft.Json.Linq.JToken)">
+<summary>
+ Get a required bool field from tool input
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Mcp.tryGetFloat(System.String,Newtonsoft.Json.Linq.JToken)">
+<summary>
+ Get an optional float field from tool input
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Mcp.getFloat(System.String,Newtonsoft.Json.Linq.JToken)">
+<summary>
+ Get a required float field from tool input
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Mcp.tryGetInt(System.String,Newtonsoft.Json.Linq.JToken)">
+<summary>
+ Get an optional int field from tool input
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Mcp.getInt(System.String,Newtonsoft.Json.Linq.JToken)">
+<summary>
+ Get a required int field from tool input
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Mcp.tryGetString(System.String,Newtonsoft.Json.Linq.JToken)">
+<summary>
+ Get an optional string field from tool input
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Mcp.getString(System.String,Newtonsoft.Json.Linq.JToken)">
+<summary>
+ Get a required string field from tool input
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Mcp.handleMcpRequest(Microsoft.FSharp.Collections.FSharpList{ClaudeAgentSdk.McpTool},Newtonsoft.Json.Linq.JToken)">
+<summary>
+ Handle an MCP JSONRPC request
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Mcp.executeToolCall(Microsoft.FSharp.Collections.FSharpList{ClaudeAgentSdk.McpTool},System.String,Newtonsoft.Json.Linq.JToken)">
+<summary>
+ Execute a tool call
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Mcp.findTool(System.String,Microsoft.FSharp.Collections.FSharpList{ClaudeAgentSdk.McpTool})">
+<summary>
+ Find tool by name
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Mcp.encodeErrorResponse(Microsoft.FSharp.Core.FSharpOption{Newtonsoft.Json.Linq.JToken},System.Int32,System.String)">
+<summary>
+ Encode MCP error response
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Mcp.encodeCallToolResponse(Microsoft.FSharp.Core.FSharpOption{Newtonsoft.Json.Linq.JToken},ClaudeAgentSdk.ToolOutput)">
+<summary>
+ Encode tools/call result
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Mcp.encodeToolContent(ClaudeAgentSdk.ToolContent)">
+<summary>
+ Encode ToolContent for MCP response
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Mcp.encodeToolListResponse(Microsoft.FSharp.Core.FSharpOption{Newtonsoft.Json.Linq.JToken},Microsoft.FSharp.Collections.FSharpList{ClaudeAgentSdk.McpTool})">
+<summary>
+ Encode tools/list response
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Mcp.encodeInitializeResponse(Microsoft.FSharp.Core.FSharpOption{Newtonsoft.Json.Linq.JToken},Microsoft.FSharp.Collections.FSharpList{ClaudeAgentSdk.McpTool})">
+<summary>
+ Encode initialize response
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Mcp.encodeToolInfo(ClaudeAgentSdk.McpTool)">
+<summary>
+ Encode MCP tool info for tools/list response
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Mcp.errorResult(System.String)">
+<summary>
+ Create a failed tool output
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Mcp.multiResult(Microsoft.FSharp.Collections.FSharpList{ClaudeAgentSdk.ToolContent})">
+<summary>
+ Create a successful multi-content tool output
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Mcp.imageResult(System.Byte[],System.String)">
+<summary>
+ Create a successful image tool output
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Mcp.textResult(System.String)">
+<summary>
+ Create a successful text tool output
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Mcp.createSdkServer(System.String,Microsoft.FSharp.Collections.FSharpList{ClaudeAgentSdk.McpTool})">
+<summary>
+ Create an SDK MCP server with tools
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Mcp.tool(System.String,System.String,ClaudeAgentSdk.Schema,Microsoft.FSharp.Core.FSharpFunc{Newtonsoft.Json.Linq.JToken,System.Threading.Tasks.Task{ClaudeAgentSdk.ToolOutput}})">
+<summary>
+ Create an MCP tool with typed schema
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Mcp.Schema.optional(System.String,ClaudeAgentSdk.Schema)">
+<summary>
+ Optional property helper
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Mcp.Schema.required(System.String,ClaudeAgentSdk.Schema)">
+<summary>
+ Required property helper
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Mcp.Schema.any">
+<summary>
+ Any schema (no validation)
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Mcp.Schema.array(ClaudeAgentSdk.Schema)">
+<summary>
+ Array schema
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Mcp.Schema.object'(Microsoft.FSharp.Collections.FSharpList{System.Tuple{System.String,ClaudeAgentSdk.Schema,System.Boolean}})">
+<summary>
+ Object schema with properties
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Mcp.Schema.bool'(System.String)">
+<summary>
+ Boolean schema with description
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Mcp.Schema.bool">
+<summary>
+ Boolean schema without description
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Mcp.Schema.number'(System.String)">
+<summary>
+ Number schema with description
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Mcp.Schema.number">
+<summary>
+ Number schema without description
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Mcp.Schema.string'(System.String)">
+<summary>
+ String schema with description
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Mcp.Schema.string">
+<summary>
+ String schema without description
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Protocol.encodeControlResponse(ClaudeAgentSdk.ControlResponse)">
+<summary>
+ Encode a control response to JSON string
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Protocol.sendInitialize(ClaudeAgentSdk.Connection,ClaudeAgentSdk.Options)">
+<summary>
+ Send initialize command for streaming mode
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Protocol.sendRewindFiles(System.String,ClaudeAgentSdk.Connection)">
+<summary>
+ Send rewind_files command
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Protocol.sendSetModel(Microsoft.FSharp.Core.FSharpOption{System.String},ClaudeAgentSdk.Connection)">
+<summary>
+ Send set_model command
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Protocol.sendSetPermissionMode(ClaudeAgentSdk.PermissionMode,ClaudeAgentSdk.Connection)">
+<summary>
+ Send set_permission_mode command
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Protocol.sendInterrupt(ClaudeAgentSdk.Connection)">
+<summary>
+ Send interrupt command
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Protocol.sendControlCommand(System.String,Microsoft.FSharp.Collections.FSharpList{System.Tuple{System.String,Newtonsoft.Json.Linq.JToken}},ClaudeAgentSdk.Connection)">
+<summary>
+ Send a control command and wait for response
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Protocol.handleControlRequestFromContext(ClaudeAgentSdk.ClientContext,ClaudeAgentSdk.ControlRequest)">
+<summary>
+ Handle control request from ClientContext
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Protocol.handleControlRequest(Microsoft.FSharp.Core.FSharpOption{Microsoft.FSharp.Core.FSharpFunc{System.String,Microsoft.FSharp.Core.FSharpFunc{Newtonsoft.Json.Linq.JToken,Microsoft.FSharp.Core.FSharpFunc{ClaudeAgentSdk.PermissionContext,System.Threading.Tasks.Task{ClaudeAgentSdk.PermissionResult}}}}},Microsoft.FSharp.Collections.FSharpMap{System.String,Microsoft.FSharp.Core.FSharpFunc{ClaudeAgentSdk.HookInput,Microsoft.FSharp.Core.FSharpFunc{Microsoft.FSharp.Core.FSharpOption{System.String},System.Threading.Tasks.Task{ClaudeAgentSdk.HookOutput}}}},Microsoft.FSharp.Collections.FSharpMap{System.String,Microsoft.FSharp.Collections.FSharpList{ClaudeAgentSdk.McpTool}},ClaudeAgentSdk.ControlRequest)">
+<summary>
+ Handle an incoming control request
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Protocol.handleMcpMessage(Microsoft.FSharp.Collections.FSharpMap{System.String,Microsoft.FSharp.Collections.FSharpList{ClaudeAgentSdk.McpTool}},System.String,System.String,Newtonsoft.Json.Linq.JToken)">
+<summary>
+ Handle an MCP message control request
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Protocol.handleHookCallback(Microsoft.FSharp.Collections.FSharpMap{System.String,Microsoft.FSharp.Core.FSharpFunc{ClaudeAgentSdk.HookInput,Microsoft.FSharp.Core.FSharpFunc{Microsoft.FSharp.Core.FSharpOption{System.String},System.Threading.Tasks.Task{ClaudeAgentSdk.HookOutput}}}},System.String,System.String,ClaudeAgentSdk.HookInput,Microsoft.FSharp.Core.FSharpOption{System.String})">
+<summary>
+ Handle a HookCallback control request
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Protocol.handleCanUseTool(Microsoft.FSharp.Core.FSharpOption{Microsoft.FSharp.Core.FSharpFunc{System.String,Microsoft.FSharp.Core.FSharpFunc{Newtonsoft.Json.Linq.JToken,Microsoft.FSharp.Core.FSharpFunc{ClaudeAgentSdk.PermissionContext,System.Threading.Tasks.Task{ClaudeAgentSdk.PermissionResult}}}}},System.String,System.String,Newtonsoft.Json.Linq.JToken,Microsoft.FSharp.Collections.FSharpList{ClaudeAgentSdk.PermissionUpdate})">
+<summary>
+ Handle a CanUseTool control request
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Query.queryStructured(System.String,ClaudeAgentSdk.Options)">
+<summary>
+ Execute a query and return structured output
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Query.queryText(System.String,ClaudeAgentSdk.Options)">
+<summary>
+ Execute a query and return the text result
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Query.queryResult(System.String,ClaudeAgentSdk.Options)">
+<summary>
+ Execute a query and return just the final result
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Query.queryCollect(System.String,ClaudeAgentSdk.Options)">
+<summary>
+ Execute a query and collect all messages into a list
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Query.queryStreaming(System.Collections.Generic.IAsyncEnumerable{System.Tuple{System.String,System.String}},ClaudeAgentSdk.Options)">
+<summary>
+ Execute a query with multiple input messages (streaming input mode)
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Query.query(System.String,ClaudeAgentSdk.Options)">
+<summary>
+ Execute a one-shot query - sends prompt and yields all messages until result
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Client.getThinking(Microsoft.FSharp.Collections.FSharpList{ClaudeAgentSdk.Message})">
+<summary>
+ Get all thinking blocks from assistant messages
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Client.getToolUses(Microsoft.FSharp.Collections.FSharpList{ClaudeAgentSdk.Message})">
+<summary>
+ Get all tool use blocks from assistant messages
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Client.getAssistantText(Microsoft.FSharp.Collections.FSharpList{ClaudeAgentSdk.Message})">
+<summary>
+ Get all text blocks from assistant messages
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Client.getResultMessage(Microsoft.FSharp.Collections.FSharpList{ClaudeAgentSdk.Message})">
+<summary>
+ Get the result message from a message list
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Client.getSystemMessages(Microsoft.FSharp.Collections.FSharpList{ClaudeAgentSdk.Message})">
+<summary>
+ Get all system messages from a message list
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Client.getUserMessages(Microsoft.FSharp.Collections.FSharpList{ClaudeAgentSdk.Message})">
+<summary>
+ Get all user messages from a message list
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Client.getAssistantMessages(Microsoft.FSharp.Collections.FSharpList{ClaudeAgentSdk.Message})">
+<summary>
+ Get all assistant messages from a message list
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Client.withSessionId(System.String,ClaudeAgentSdk.ClientContext)">
+<summary>
+ Update session ID in context
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Client.queryText(System.String,ClaudeAgentSdk.ClientContext)">
+<summary>
+ Send a prompt and get the text result
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Client.queryResult(System.String,ClaudeAgentSdk.ClientContext)">
+<summary>
+ Send a prompt and get the final result message
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Client.query(System.String,ClaudeAgentSdk.ClientContext)">
+<summary>
+ Send a prompt and receive all messages in one operation
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Client.rewindFiles(System.String,ClaudeAgentSdk.ClientContext)">
+<summary>
+ Rewind files to state at given user message ID
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Client.setModel(Microsoft.FSharp.Core.FSharpOption{System.String},ClaudeAgentSdk.ClientContext)">
+<summary>
+ Set model (or None to use default)
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Client.setPermissionMode(ClaudeAgentSdk.PermissionMode,ClaudeAgentSdk.ClientContext)">
+<summary>
+ Set permission mode
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Client.interrupt(ClaudeAgentSdk.ClientContext)">
+<summary>
+ Send interrupt command to stop current operation
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Client.receiveAll(ClaudeAgentSdk.ClientContext)">
+<summary>
+ Receive all messages until result and collect into a list
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Client.receive(ClaudeAgentSdk.ClientContext)">
+<summary>
+ Receive messages as a TaskSeq, automatically handling control requests
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Client.sendRaw(Newtonsoft.Json.Linq.JToken,ClaudeAgentSdk.ClientContext)">
+<summary>
+ Send a raw JSON message
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Client.send(System.String,ClaudeAgentSdk.ClientContext)">
+<summary>
+ Send a user message (prompt)
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Client.disconnect(ClaudeAgentSdk.ClientContext)">
+<summary>
+ Disconnect and close the connection
+</summary>
+</member>
+<member name="M:ClaudeAgentSdk.Client.connect(ClaudeAgentSdk.Options)">
+<summary>
+ Connect to Claude Code CLI with given options
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.queryStructured">
+<summary>
+ Execute a query and return structured output
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.queryText">
+<summary>
+ Execute a query and return the text result
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.queryResult">
+<summary>
+ Execute a query and return the result message
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.queryCollect">
+<summary>
+ Execute a query and collect all messages
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.queryStreaming">
+<summary>
+ Execute a query with streaming input
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.query">
+<summary>
+ Execute a one-shot query (non-interactive)
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Hooks.suppressOutput">
+<summary>
+ Suppress output in hook response
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Hooks.withSystemMessage">
+<summary>
+ Add system message to hook response
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Hooks.userPromptSubmitResponse">
+<summary>
+ User prompt submit response with context
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Hooks.postToolUseResponse">
+<summary>
+ Post-tool-use response with context
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Hooks.preToolUseResponse">
+<summary>
+ Pre-tool-use response with permission decision
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Hooks.asyncHook">
+<summary>
+ Async hook response
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Hooks.blockHook">
+<summary>
+ Block hook response
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Hooks.continueHook">
+<summary>
+ Continue hook response
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Hooks.getCwd">
+<summary>
+ Get cwd from hook input
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Hooks.getTranscriptPath">
+<summary>
+ Get transcript path from hook input
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Hooks.getSessionId">
+<summary>
+ Get session ID from hook input
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Hooks.withTimeout">
+<summary>
+ Add timeout to a matcher
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Hooks.matchTool">
+<summary>
+ Create a matcher for specific tool pattern
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Hooks.matchAll">
+<summary>
+ Create a matcher for all tools
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Hooks.buildHookCallbacks">
+<summary>
+ Build hook callbacks from matchers
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Mcp.handleMcpRequest">
+<summary>
+ Handle MCP JSONRPC request
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Mcp.errorResult">
+<summary>
+ Create error result
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Mcp.multiResult">
+<summary>
+ Create successful multi-content result
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Mcp.imageResult">
+<summary>
+ Create successful image result
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Mcp.textResult">
+<summary>
+ Create successful text result
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Mcp.createSdkServer">
+<summary>
+ Create an SDK MCP server
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Mcp.tool">
+<summary>
+ Create an MCP tool
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Client.getThinking">
+<summary>
+ Get thinking blocks from messages
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Client.getToolUses">
+<summary>
+ Get tool uses from messages
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Client.getAssistantText">
+<summary>
+ Get text from assistant messages
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Client.getResultMessage">
+<summary>
+ Get result message from list
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Client.getSystemMessages">
+<summary>
+ Get system messages from list
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Client.getUserMessages">
+<summary>
+ Get user messages from list
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Client.getAssistantMessages">
+<summary>
+ Get assistant messages from list
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Client.withSessionId">
+<summary>
+ Update session ID
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Client.queryText">
+<summary>
+ Send prompt and get text result
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Client.queryResult">
+<summary>
+ Send prompt and get result message
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Client.query">
+<summary>
+ Send prompt and receive all messages
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Client.rewindFiles">
+<summary>
+ Rewind files to state at user message ID
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Client.setModel">
+<summary>
+ Set model
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Client.setPermissionMode">
+<summary>
+ Set permission mode
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Client.interrupt">
+<summary>
+ Send interrupt command
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Client.receiveAll">
+<summary>
+ Receive all messages until result
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Client.receive">
+<summary>
+ Receive messages as a TaskSeq
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Client.sendRaw">
+<summary>
+ Send a raw JSON message
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Client.send">
+<summary>
+ Send a user message
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Client.disconnect">
+<summary>
+ Disconnect and close the connection
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.Client.connect">
+<summary>
+ Connect to Claude Code CLI
+</summary>
+</member>
+<member name="P:ClaudeAgentSdk.Sdk.OptionsModule.defaults">
+<summary>
+ Default options with sensible defaults
+</summary>
+</member>
+<member name="T:ClaudeAgentSdk.Sdk">
+<summary>
+ Claude Agent SDK for F# - Public API
+</summary>
+</member>
+</members>
+</doc>

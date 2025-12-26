@@ -1,0 +1,13 @@
+/Users/snowbear/WORK/GIT/claude-agent-sdk-fsharp/src/ClaudeAgentSdk/obj/Debug/net8.0/ClaudeAgentSdk.fsproj.AssemblyReference.cache
+/Users/snowbear/WORK/GIT/claude-agent-sdk-fsharp/src/ClaudeAgentSdk/obj/Debug/net8.0/ClaudeAgentSdk.AssemblyInfoInputs.cache
+/Users/snowbear/WORK/GIT/claude-agent-sdk-fsharp/src/ClaudeAgentSdk/obj/Debug/net8.0/ClaudeAgentSdk.AssemblyInfo.fs
+/Users/snowbear/WORK/GIT/claude-agent-sdk-fsharp/src/ClaudeAgentSdk/obj/Debug/net8.0/ClaudeAgentSdk.fsproj.CoreCompileInputs.cache
+/Users/snowbear/WORK/GIT/claude-agent-sdk-fsharp/src/ClaudeAgentSdk/bin/Debug/net8.0/ClaudeAgentSdk.deps.json
+/Users/snowbear/WORK/GIT/claude-agent-sdk-fsharp/src/ClaudeAgentSdk/bin/Debug/net8.0/ClaudeAgentSdk.dll
+/Users/snowbear/WORK/GIT/claude-agent-sdk-fsharp/src/ClaudeAgentSdk/bin/Debug/net8.0/ClaudeAgentSdk.pdb
+/Users/snowbear/WORK/GIT/claude-agent-sdk-fsharp/src/ClaudeAgentSdk/bin/Debug/net8.0/ClaudeAgentSdk.xml
+/Users/snowbear/WORK/GIT/claude-agent-sdk-fsharp/src/ClaudeAgentSdk/obj/Debug/net8.0/ClaudeAgentSdk.dll
+/Users/snowbear/WORK/GIT/claude-agent-sdk-fsharp/src/ClaudeAgentSdk/obj/Debug/net8.0/refint/ClaudeAgentSdk.dll
+/Users/snowbear/WORK/GIT/claude-agent-sdk-fsharp/src/ClaudeAgentSdk/obj/Debug/net8.0/ClaudeAgentSdk.xml
+/Users/snowbear/WORK/GIT/claude-agent-sdk-fsharp/src/ClaudeAgentSdk/obj/Debug/net8.0/ClaudeAgentSdk.pdb
+/Users/snowbear/WORK/GIT/claude-agent-sdk-fsharp/src/ClaudeAgentSdk/obj/Debug/net8.0/ref/ClaudeAgentSdk.dll

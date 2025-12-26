@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "dgSpecHash": "NI9kY1mReRg=",
+  "success": true,
+  "projectFilePath": "/Users/snowbear/WORK/GIT/claude-agent-sdk-fsharp/src/ClaudeAgentSdk/ClaudeAgentSdk.fsproj",
+  "expectedPackageFiles": [
+    "/Users/snowbear/.nuget/packages/fable.core/3.1.6/fable.core.3.1.6.nupkg.sha512",
+    "/Users/snowbear/.nuget/packages/fsharp.control.taskseq/0.4.0/fsharp.control.taskseq.0.4.0.nupkg.sha512",
+    "/Users/snowbear/.nuget/packages/fsharp.core/8.0.403/fsharp.core.8.0.403.nupkg.sha512",
+    "/Users/snowbear/.nuget/packages/fstoolkit.errorhandling/4.18.0/fstoolkit.errorhandling.4.18.0.nupkg.sha512",
+    "/Users/snowbear/.nuget/packages/fstoolkit.errorhandling.taskresult/4.18.0/fstoolkit.errorhandling.taskresult.4.18.0.nupkg.sha512",
+    "/Users/snowbear/.nuget/packages/newtonsoft.json/11.0.2/newtonsoft.json.11.0.2.nupkg.sha512",
+    "/Users/snowbear/.nuget/packages/thoth.json.net/11.0.0/thoth.json.net.11.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}

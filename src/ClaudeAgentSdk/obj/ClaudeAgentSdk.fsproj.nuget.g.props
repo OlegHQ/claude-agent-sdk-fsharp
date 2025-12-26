@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
+    <RestoreSuccess Condition=" '$(RestoreSuccess)' == '' ">True</RestoreSuccess>
+    <RestoreTool Condition=" '$(RestoreTool)' == '' ">NuGet</RestoreTool>
+    <ProjectAssetsFile Condition=" '$(ProjectAssetsFile)' == '' ">$(MSBuildThisFileDirectory)project.assets.json</ProjectAssetsFile>
+    <NuGetPackageRoot Condition=" '$(NuGetPackageRoot)' == '' ">/Users/snowbear/.nuget/packages/</NuGetPackageRoot>
+    <NuGetPackageFolders Condition=" '$(NuGetPackageFolders)' == '' ">/Users/snowbear/.nuget/packages/</NuGetPackageFolders>
+    <NuGetProjectStyle Condition=" '$(NuGetProjectStyle)' == '' ">PackageReference</NuGetProjectStyle>
+    <NuGetToolVersion Condition=" '$(NuGetToolVersion)' == '' ">6.11.1</NuGetToolVersion>
+  </PropertyGroup>
+  <ItemGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
+    <SourceRoot Include="/Users/snowbear/.nuget/packages/" />
+  </ItemGroup>
+  <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
+    <PkgFSharp_Core Condition=" '$(PkgFSharp_Core)' == '' ">/Users/snowbear/.nuget/packages/fsharp.core/8.0.403</PkgFSharp_Core>
+    <PkgThoth_Json_Net Condition=" '$(PkgThoth_Json_Net)' == '' ">/Users/snowbear/.nuget/packages/thoth.json.net/11.0.0</PkgThoth_Json_Net>
+    <PkgFsToolkit_ErrorHandling_TaskResult Condition=" '$(PkgFsToolkit_ErrorHandling_TaskResult)' == '' ">/Users/snowbear/.nuget/packages/fstoolkit.errorhandling.taskresult/4.18.0</PkgFsToolkit_ErrorHandling_TaskResult>
+    <PkgFSharp_Control_TaskSeq Condition=" '$(PkgFSharp_Control_TaskSeq)' == '' ">/Users/snowbear/.nuget/packages/fsharp.control.taskseq/0.4.0</PkgFSharp_Control_TaskSeq>
+  </PropertyGroup>
+</Project>
