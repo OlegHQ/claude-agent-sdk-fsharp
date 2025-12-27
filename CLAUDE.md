@@ -14,12 +14,14 @@ Port `claude-agent-sdk-python` to idiomatic F#. 100% feature parity.
 ```
 src/
 ├── Types.fs       # All DUs and records
+├── Events.fs      # Event bus for monitoring
 ├── Json.fs        # JSON helpers
 ├── Transport.fs   # Subprocess spawn/read/write
-├── Protocol.fs    # Control protocol
 ├── Parser.fs      # JSON → Message
 ├── Hooks.fs       # Hook execution
 ├── Mcp.fs         # MCP tools
+├── Streaming.fs   # TaskSeq helpers
+├── Protocol.fs    # Control protocol
 ├── Query.fs       # One-shot query
 ├── Client.fs      # Streaming client
 └── Sdk.fs         # Public API
@@ -76,41 +78,53 @@ type SdkError =
 
 // Config as record (immutable data, not object)
 type Options = {
-    Tools: string list option
+    Tools: ToolsConfig option
+    ToolAllowMode: ToolAllowMode              // NEW: Auto-allow MCP tools
     AllowedTools: string list
     DisallowedTools: string list
-    SystemPrompt: string option
+    SystemPrompt: SystemPromptConfig option
     Model: string option
-    PermissionMode: string option
+    FallbackModel: string option
+    PermissionMode: PermissionMode option
     MaxTurns: int option
     MaxBudgetUsd: float option
+    MaxThinkingTokens: int option
     Cwd: string option
     CliPath: string option
     Env: Map<string, string>
+    ExtraArgs: Map<string, string option>
     McpServers: Map<string, McpServer>
-    Hooks: Map<string, HookMatcher list>
-    CanUseTool: (string -> JsonValue -> Task<PermissionResult>) option
+    Hooks: Map<HookEvent, HookMatcher list>
+    CanUseTool: (string -> JsonValue -> PermissionContext -> Task<PermissionResult>) option
+    Events: EventBus option                   // NEW: Event subscription
     OutputFormat: Schema option
-    EnableCheckpointing: bool
+    EnableFileCheckpointing: bool
+    // ... and more (30+ fields total)
 }
 
 let defaults = {
     Tools = None
+    ToolAllowMode = AutoAllowMcp              // NEW: Smart default
     AllowedTools = []
     DisallowedTools = []
     SystemPrompt = None
     Model = None
+    FallbackModel = None
     PermissionMode = None
     MaxTurns = None
     MaxBudgetUsd = None
+    MaxThinkingTokens = None
     Cwd = None
     CliPath = None
     Env = Map.empty
+    ExtraArgs = Map.empty
     McpServers = Map.empty
     Hooks = Map.empty
     CanUseTool = None
+    Events = None                             // NEW: Opt-in events
     OutputFormat = None
-    EnableCheckpointing = false
+    EnableFileCheckpointing = false
+    // ... (see Types.fs for all fields)
 }
 ```
 
@@ -190,40 +204,74 @@ let parseMessage = function
 type ToolContent = Text of string | Image of bytes: byte[] * mime: string
 type ToolOutput = Success of ToolContent list | Failure of string
 
-// Schema DSL instead of JsonValue
+// Schema DSL with consistent descriptions
 type Schema =
-    | SString | SNumber | SBool
-    | SObject of (string * Schema * bool) list  // name, type, required
-    | SArray of Schema
+    | SString of description: string option
+    | SNumber of description: string option
+    | SBool of description: string option
+    | SObject of description: string option * properties: (string * Schema * bool) list
+    | SArray of description: string option * itemSchema: Schema
+    | SAny
 
 module Schema =
-    let string = SString
-    let object' props = SObject props
+    let string = SString None
+    let string' desc = SString (Some desc)
+    let object' props = SObject (None, props)
+    let object'' desc props = SObject (Some desc, props)
     let required name s = (name, s, true)
+    let optional name s = (name, s, false)
 
-// Decoder combinators
-module Decode =
-    let field name f json = json |> tryProp name |> Option.toResult $"missing: {name}" |> Result.bind f
-    let string = function JsonValue.String s -> Ok s | _ -> Error "expected string"
+type McpTool = { Name: string; Description: string; InputSchema: Schema; Handler: JsonValue -> Task<ToolOutput> }
 
-type McpTool = { Name: string; Description: string; Schema: Schema; Handler: JsonValue -> Task<ToolOutput> }
+// Usage - clean tool creation
+let greet = Mcp.tool "greet" "Says hello"
+    (Mcp.Schema.object' [
+        Mcp.Schema.required "name" (Mcp.Schema.string' "The name to greet")
+    ])
+    (fun input -> task {
+        match Mcp.getString "name" input with
+        | Ok name -> return Mcp.textResult (sprintf "Hello, %s!" name)
+        | Error e -> return Mcp.errorResult e
+    })
 
-// Usage - typed input via decoder
-let greet = {
-    Name = "greet"; Description = "Says hello"
-    Schema = Schema.object' [ Schema.required "name" Schema.string ]
-    Handler = fun json -> task {
-        match json |> Decode.field "name" Decode.string with
-        | Ok name -> return Success [ Text $"Hello, {name}!" ]
-        | Error e -> return Failure e
-    }
+// Create server and auto-allow
+let server = Mcp.createSdkServer "greetings" [greet]
+let options = {
+    Options.defaults with
+        McpServers = Map.ofList ["greetings", server]
+        // Tools automatically allowed!
 }
+```
+
+## Examples
+
+All examples follow functional principles (zero mutable state):
+
+```
+examples/BasicUsage/
+├── Common.fs              # Functional Logger + helpers
+├── 01-QuickStart.fs       # Simplest query
+├── 02-StreamingBasic.fs   # TaskSeq patterns
+├── 03-McpTools.fs         # MCP tools with auto-allow
+├── 04-HooksAndPermissions.fs  # Security hooks
+├── 05-InteractiveSession.fs   # Recursive REPL
+├── 06-HumanInTheLoop.fs   # Permission callbacks
+├── 07-EventsExample.fs    # Event system
+├── 08-MaxBudget.fs        # Budget control
+├── 09-StructuredOutput.fs # JSON schema output
+└── 11-AskUserTool.fs      # Bidirectional interaction
+```
+
+**Run examples:**
+```bash
+dotnet run --project examples/BasicUsage -- 01  # Quick start
+dotnet run --project examples/BasicUsage -- all # All examples
 ```
 
 ## What This Is NOT
 
 - No `type Foo() = member ...` classes
-- No `mutable` fields
+- No `mutable` fields (except internal SDK/examples helpers where necessary)
 - No interfaces
 - No inheritance
 - No dependency injection
@@ -235,15 +283,159 @@ let greet = {
 ```xml
 <PackageReference Include="FSharp.Control.TaskSeq" Version="0.4.*" />
 <PackageReference Include="FsToolkit.ErrorHandling.TaskResult" Version="4.*" />
+<PackageReference Include="Thoth.Json.Net" Version="11.*" />
 ```
 
 ## Features
 
-- [ ] `query` - one-shot, returns `TaskSeq<Result<Message, SdkError>>`
-- [ ] `Client.connect/send/receive` - state machine
-- [ ] Control protocol commands
-- [ ] Message/Content types as DUs
-- [ ] Options record with defaults
-- [ ] Hooks
-- [ ] MCP servers (typed tools)
-- [ ] Permission callbacks
+- [x] `query` - one-shot, returns `TaskSeq<Result<Message, SdkError>>`
+- [x] `Client.connect/send/receive` - state machine
+- [x] Control protocol commands
+- [x] Message/Content types as DUs
+- [x] Options record with defaults
+- [x] Hooks
+- [x] MCP servers (typed tools) with **auto-allow**
+- [x] Permission callbacks
+- [x] **Event system** - subscribe to SDK events
+- [x] **Streaming helpers** - clean TaskSeq utilities
+
+## MCP Tools - Auto-Allow by Default
+
+MCP tools are automatically allowed when registered. No manual allowlisting needed!
+
+```fsharp
+let server = Mcp.createSdkServer "tools" [greetTool; calcTool]
+
+let options = {
+    Options.defaults with
+        McpServers = Map.ofList ["tools", server]
+        // AllowedTools NOT needed! Auto-allowed by default
+        ToolAllowMode = AutoAllowMcp  // This is the default
+}
+```
+
+**Opt-out specific tools:**
+```fsharp
+{ options with DisallowedTools = ["mcp__tools__greet"] }
+```
+
+**Manual control** (old behavior):
+```fsharp
+{ options with
+    ToolAllowMode = ManualControl
+    AllowedTools = ["mcp__tools__calc"] }
+```
+
+**Benefits:**
+- ✅ No more brittle string literals like `"mcp__server__tool"`
+- ✅ Type-safe through `ToolAllowMode` DU
+- ✅ Cleaner API for the common case
+- ✅ Backward compatible
+
+## Event-Driven Architecture
+
+Subscribe to SDK events for logging, monitoring, and debugging:
+
+```fsharp
+// Create event bus
+let bus = Events.createBus ()
+
+// Subscribe to events
+let subId = Events.subscribe (fun event ->
+    match event with
+    | MessageReceived msg ->
+        printfn "Got message: %A" msg
+    | ToolUseStarted (name, id, _) ->
+        printfn "Tool started: %s" name
+    | ThinkingStarted content ->
+        printfn "Thinking: %s" (content.[..min 50 content.Length])
+    | ConnectionEstablished cliPath ->
+        printfn "Connected: %s" cliPath
+    | ErrorOccurred err ->
+        printfn "Error: %A" err
+    | _ -> ()
+) bus
+
+// Use in options
+let options = { Options.defaults with Events = Some bus }
+```
+
+**Event Types:**
+```fsharp
+type SdkEvent =
+    | MessageReceived of Message
+    | MessageSent of prompt: string * sessionId: string
+    | ToolUseStarted of toolName: string * toolId: string * input: JsonValue
+    | ToolUseCompleted of toolName: string * toolId: string * output: JsonValue
+    | ThinkingStarted of content: string
+    | SessionStarted of sessionId: string
+    | SessionEnded of sessionId: string * result: ResultMessage option
+    | ErrorOccurred of SdkError
+    | ConnectionEstablished of cliPath: string
+    | ConnectionClosed
+```
+
+**Multiple subscribers:**
+```fsharp
+let sub1 = Events.subscribe logger1 bus
+let sub2 = Events.subscribe logger2 bus
+
+// Unsubscribe when done
+Events.unsubscribe sub1 bus
+```
+
+## Streaming Helpers
+
+Clean TaskSeq utilities to avoid manual enumerators:
+
+```fsharp
+// Pattern 1: forEach with side effects
+let! error = Streaming.forEach (fun msg ->
+    printfn "%A" msg
+) (Client.receive ctx)
+
+// Pattern 2: Collect into list
+let! (messages, error) = Streaming.collect (Client.receive ctx)
+
+// Pattern 3: Conditional iteration
+let! _ = Streaming.forEachWhile (fun msg ->
+    match msg with
+    | ResultMsg _ -> false  // Stop
+    | _ -> true             // Continue
+) (Client.receive ctx)
+
+// Pattern 4: Filter messages
+let assistantOnly =
+    Client.receive ctx
+    |> Streaming.filterMessages (function AssistantMsg _ -> true | _ -> false)
+
+// Pattern 5: Take until result
+let upToResult =
+    Client.receive ctx
+    |> Streaming.takeUntilResult
+```
+
+**No more manual `GetAsyncEnumerator()`!**
+
+## Schema Consistency
+
+All schema variants now support optional descriptions:
+
+```fsharp
+// Without descriptions
+Mcp.Schema.string
+Mcp.Schema.number
+Mcp.Schema.bool
+Mcp.Schema.object' [...]
+Mcp.Schema.array itemSchema
+
+// With descriptions
+Mcp.Schema.string' "A user's name"
+Mcp.Schema.number' "Age in years"
+Mcp.Schema.bool' "Is active"
+Mcp.Schema.object'' "Person data" [...]
+Mcp.Schema.array' "List of items" itemSchema
+
+// Add description to any schema
+Mcp.Schema.string |> Mcp.Schema.describe "User name"
+```

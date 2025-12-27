@@ -6,13 +6,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Logging.fs" />
-    <Compile Include="SimpleQuery.fs" />
-    <Compile Include="InteractiveClient.fs" />
-    <Compile Include="McpTools.fs" />
-    <Compile Include="HooksAndPermissions.fs" />
-    <Compile Include="HumanInTheLoop.fs" />
-    <Compile Include="AskUserTool.fs" />
+    <Compile Include="Common.fs" />
+    <Compile Include="01-QuickStart.fs" />
+    <Compile Include="02-StreamingBasic.fs" />
+    <Compile Include="03-McpTools.fs" />
+    <Compile Include="04-HooksAndPermissions.fs" />
+    <Compile Include="05-InteractiveSession.fs" />
+    <Compile Include="06-HumanInTheLoop.fs" />
+    <Compile Include="07-EventsExample.fs" />
+    <Compile Include="08-MaxBudget.fs" />
+    <Compile Include="09-StructuredOutput.fs" />
+    <Compile Include="11-AskUserTool.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

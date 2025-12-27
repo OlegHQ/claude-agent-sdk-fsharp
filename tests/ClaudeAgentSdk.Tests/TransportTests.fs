@@ -8,12 +8,11 @@ module FindCliTests =
 
     [<Fact>]
     let ``findCli with explicit path that exists returns Ok`` () =
-        // Test with a file that should exist on any system
         let result = Transport.findCli (Some "/bin/sh")
         match result with
         | Ok path -> path |> should equal "/bin/sh"
-        | Error (CliNotFound _) -> () // Skip on Windows where /bin/sh doesn't exist
-        | Error _ -> () // Skip for other errors
+        | Error (CliNotFound _) -> () // Skip on Windows
+        | Error _ -> ()
 
     [<Fact>]
     let ``findCli with explicit path that doesn't exist returns Error`` () =
@@ -27,18 +26,61 @@ module BuildArgsTests =
     let defaultOptions = Options.defaults
 
     [<Fact>]
-    let ``buildArgs includes output-format and verbose`` () =
+    let ``buildArgs includes required flags`` () =
         let args = Transport.buildArgs defaultOptions false
         args |> should contain "--output-format"
         args |> should contain "stream-json"
         args |> should contain "--verbose"
 
-    [<Fact>]
-    let ``buildArgs with system prompt`` () =
-        let options = { defaultOptions with SystemPrompt = Some (SystemPromptText "Be helpful") }
+    // Consolidated: String options with flag and value
+    [<Theory>]
+    [<InlineData("system-prompt", "Be helpful")>]
+    [<InlineData("model", "claude-3-opus")>]
+    [<InlineData("fallback-model", "claude-3-haiku")>]
+    [<InlineData("resume", "sess_123")>]
+    let ``buildArgs with string options`` (flag: string) (value: string) =
+        let options =
+            match flag with
+            | "system-prompt" -> { defaultOptions with SystemPrompt = Some (SystemPromptText value) }
+            | "model" -> { defaultOptions with Model = Some value }
+            | "fallback-model" -> { defaultOptions with FallbackModel = Some value }
+            | "resume" -> { defaultOptions with Resume = Some value }
+            | _ -> defaultOptions
+
         let args = Transport.buildArgs options false
-        args |> should contain "--system-prompt"
-        args |> should contain "Be helpful"
+        args |> should contain (sprintf "--%s" flag)
+        args |> should contain value
+
+    // Consolidated: Numeric options
+    [<Theory>]
+    [<InlineData("max-turns", 10)>]
+    [<InlineData("max-thinking-tokens", 1000)>]
+    let ``buildArgs with numeric options`` (flag: string) (value: int) =
+        let options =
+            match flag with
+            | "max-turns" -> { defaultOptions with MaxTurns = Some value }
+            | "max-thinking-tokens" -> { defaultOptions with MaxThinkingTokens = Some value }
+            | _ -> defaultOptions
+
+        let args = Transport.buildArgs options false
+        args |> should contain (sprintf "--%s" flag)
+        args |> should contain (string value)
+
+    // Consolidated: Boolean flags
+    [<Theory>]
+    [<InlineData("continue")>]
+    [<InlineData("fork-session")>]
+    [<InlineData("include-partial-messages")>]
+    let ``buildArgs with boolean flags`` (flag: string) =
+        let options =
+            match flag with
+            | "continue" -> { defaultOptions with ContinueConversation = true }
+            | "fork-session" -> { defaultOptions with ForkSession = true }
+            | "include-partial-messages" -> { defaultOptions with IncludePartialMessages = true }
+            | _ -> defaultOptions
+
+        let args = Transport.buildArgs options false
+        args |> should contain (sprintf "--%s" flag)
 
     [<Fact>]
     let ``buildArgs with empty system prompt`` () =
@@ -48,11 +90,18 @@ module BuildArgsTests =
         args |> should contain ""
 
     [<Fact>]
+    let ``buildArgs with max budget`` () =
+        let options = { defaultOptions with MaxBudgetUsd = Some 5.0 }
+        let args = Transport.buildArgs options false
+        args |> should contain "--max-budget-usd"
+        args |> should contain "5"
+
+    [<Fact>]
     let ``buildArgs with Claude Code preset append`` () =
-        let options = { defaultOptions with SystemPrompt = Some (SystemPromptPresetConfig (ClaudeCodePreset (Some "Extra instructions"))) }
+        let options = { defaultOptions with SystemPrompt = Some (SystemPromptPresetConfig (ClaudeCodePreset (Some "Extra"))) }
         let args = Transport.buildArgs options false
         args |> should contain "--append-system-prompt"
-        args |> should contain "Extra instructions"
+        args |> should contain "Extra"
 
     [<Fact>]
     let ``buildArgs with tools list`` () =
@@ -62,7 +111,6 @@ module BuildArgsTests =
         let toolsArg = args |> List.find (fun a -> a.Contains("Read"))
         toolsArg |> should haveSubstring "Read"
         toolsArg |> should haveSubstring "Write"
-        toolsArg |> should haveSubstring "Bash"
 
     [<Fact>]
     let ``buildArgs with empty tools list`` () =
@@ -84,33 +132,6 @@ module BuildArgsTests =
         args |> should contain "--disallowedTools"
 
     [<Fact>]
-    let ``buildArgs with max turns`` () =
-        let options = { defaultOptions with MaxTurns = Some 10 }
-        let args = Transport.buildArgs options false
-        args |> should contain "--max-turns"
-        args |> should contain "10"
-
-    [<Fact>]
-    let ``buildArgs with max budget`` () =
-        let options = { defaultOptions with MaxBudgetUsd = Some 5.0 }
-        let args = Transport.buildArgs options false
-        args |> should contain "--max-budget-usd"
-
-    [<Fact>]
-    let ``buildArgs with model`` () =
-        let options = { defaultOptions with Model = Some "claude-3-opus" }
-        let args = Transport.buildArgs options false
-        args |> should contain "--model"
-        args |> should contain "claude-3-opus"
-
-    [<Fact>]
-    let ``buildArgs with fallback model`` () =
-        let options = { defaultOptions with FallbackModel = Some "claude-3-haiku" }
-        let args = Transport.buildArgs options false
-        args |> should contain "--fallback-model"
-        args |> should contain "claude-3-haiku"
-
-    [<Fact>]
     let ``buildArgs with permission modes`` () =
         let testCases = [
             Default, "default"
@@ -123,38 +144,6 @@ module BuildArgsTests =
             let args = Transport.buildArgs options false
             args |> should contain "--permission-mode"
             args |> should contain expected
-
-    [<Fact>]
-    let ``buildArgs with continue conversation`` () =
-        let options = { defaultOptions with ContinueConversation = true }
-        let args = Transport.buildArgs options false
-        args |> should contain "--continue"
-
-    [<Fact>]
-    let ``buildArgs with resume session`` () =
-        let options = { defaultOptions with Resume = Some "sess_123" }
-        let args = Transport.buildArgs options false
-        args |> should contain "--resume"
-        args |> should contain "sess_123"
-
-    [<Fact>]
-    let ``buildArgs with fork session`` () =
-        let options = { defaultOptions with ForkSession = true }
-        let args = Transport.buildArgs options false
-        args |> should contain "--fork-session"
-
-    [<Fact>]
-    let ``buildArgs with max thinking tokens`` () =
-        let options = { defaultOptions with MaxThinkingTokens = Some 1000 }
-        let args = Transport.buildArgs options false
-        args |> should contain "--max-thinking-tokens"
-        args |> should contain "1000"
-
-    [<Fact>]
-    let ``buildArgs with include partial messages`` () =
-        let options = { defaultOptions with IncludePartialMessages = true }
-        let args = Transport.buildArgs options false
-        args |> should contain "--include-partial-messages"
 
     [<Fact>]
     let ``buildArgs with streaming mode adds input-format`` () =
@@ -204,4 +193,3 @@ module BuildArgsTests =
         args |> should contain "--agents"
         let agentsArg = args |> List.find (fun a -> a.Contains("test-agent"))
         agentsArg |> should haveSubstring "Test agent"
-

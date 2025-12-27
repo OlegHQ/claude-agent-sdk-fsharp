@@ -560,7 +560,7 @@ module Encode =
                 | Some d -> "description", Encode.string d
                 | None -> ()
             ]
-        | SObject props ->
+        | SObject (desc, props) ->
             let properties =
                 props
                 |> List.map (fun (name, s, _) -> name, schema s)
@@ -570,13 +570,19 @@ module Encode =
                 |> List.map (fun (name, _, _) -> name)
             Encode.object [
                 "type", Encode.string "object"
+                match desc with
+                | Some d -> "description", Encode.string d
+                | None -> ()
                 "properties", Encode.object properties
                 if not (List.isEmpty required) then
                     "required", Encode.list (List.map Encode.string required)
             ]
-        | SArray itemSchema ->
+        | SArray (desc, itemSchema) ->
             Encode.object [
                 "type", Encode.string "array"
+                match desc with
+                | Some d -> "description", Encode.string d
+                | None -> ()
                 "items", schema itemSchema
             ]
         | SAny ->

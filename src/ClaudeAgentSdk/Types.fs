@@ -190,8 +190,8 @@ type Schema =
     | SString of description: string option
     | SNumber of description: string option
     | SBool of description: string option
-    | SObject of properties: (string * Schema * bool) list  // name, schema, required
-    | SArray of Schema
+    | SObject of description: string option * properties: (string * Schema * bool) list
+    | SArray of description: string option * itemSchema: Schema
     | SAny
 
 // ============================================================================
@@ -290,12 +290,44 @@ type ToolsConfig =
     | ToolsList of string list
     | ToolsPresetConfig of ToolsPreset
 
+type ToolAllowMode =
+    | AutoAllowMcp        // Auto-allow all MCP tools (default)
+    | ManualControl       // Explicit AllowedTools only
+
+// ============================================================================
+// Event Types
+// ============================================================================
+
+type SdkEvent =
+    | MessageReceived of Message
+    | MessageSent of prompt: string * sessionId: string
+    | ToolUseStarted of toolName: string * toolId: string * input: JsonValue
+    | ToolUseCompleted of toolName: string * toolId: string * output: JsonValue
+    | ThinkingStarted of content: string
+    | SessionStarted of sessionId: string
+    | SessionEnded of sessionId: string * result: ResultMessage option
+    | ErrorOccurred of SdkError
+    | ConnectionEstablished of cliPath: string
+    | ConnectionClosed
+
+type EventHandler = SdkEvent -> unit
+
+type EventSubscription = {
+    Id: Guid
+    Handler: EventHandler
+}
+
+type EventBus = {
+    Subscriptions: EventSubscription list ref
+}
+
 // ============================================================================
 // Options Record
 // ============================================================================
 
 type Options = {
     Tools: ToolsConfig option
+    ToolAllowMode: ToolAllowMode
     AllowedTools: string list
     DisallowedTools: string list
     SystemPrompt: SystemPromptConfig option
@@ -326,12 +358,14 @@ type Options = {
     OutputFormat: Schema option
     EnableFileCheckpointing: bool
     MaxBufferSize: int option
+    Events: EventBus option
     Stderr: (string -> unit) option
 }
 
 module Options =
     let defaults = {
         Tools = None
+        ToolAllowMode = AutoAllowMcp
         AllowedTools = []
         DisallowedTools = []
         SystemPrompt = None
@@ -362,8 +396,20 @@ module Options =
         OutputFormat = None
         EnableFileCheckpointing = false
         MaxBufferSize = None
+        Events = None
         Stderr = None
     }
+
+    /// Enumerate MCP tool names from registered servers for auto-allowing
+    let enumerateMcpTools (mcpServers: Map<string, McpServer>) : string list =
+        mcpServers
+        |> Map.toList
+        |> List.collect (fun (serverName, server) ->
+            match server with
+            | SdkServer(_, tools) ->
+                tools |> List.map (fun t -> $"mcp__{serverName}__{t.Name}")
+            | _ -> []  // External servers discover tools dynamically
+        )
 
 // ============================================================================
 // Connection Types

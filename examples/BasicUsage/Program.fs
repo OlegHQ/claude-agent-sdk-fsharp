@@ -24,50 +24,78 @@ let main args =
 
     let run = task {
         match example.ToLower() with
-        | "query" | "simple" ->
-            printfn "Running: Simple Query Examples\n"
-            do! runExample "SimpleQuery" Examples.SimpleQuery.runAll
+        | "01" | "quick" | "quickstart" ->
+            printfn "Running: 01-QuickStart\n"
+            do! runExample "QuickStart" Examples.QuickStart.run
 
-        | "client" | "interactive" ->
-            printfn "Running: Interactive Client Examples\n"
-            do! runExample "InteractiveClient" Examples.InteractiveClient.runAll
+        | "02" | "streaming" | "stream" ->
+            printfn "Running: 02-StreamingBasic\n"
+            do! runExample "StreamingBasic" Examples.StreamingBasic.runAll
 
-        | "mcp" | "tools" ->
-            printfn "Running: MCP Tools Examples\n"
+        | "03" | "mcp" | "tools" ->
+            printfn "Running: 03-McpTools\n"
             do! runExample "McpTools" Examples.McpTools.runAll
 
-        | "hooks" | "permissions" ->
-            printfn "Running: Hooks and Permissions Examples\n"
+        | "04" | "hooks" | "permissions" ->
+            printfn "Running: 04-HooksAndPermissions\n"
             do! runExample "HooksAndPermissions" Examples.HooksAndPermissions.runAll
 
-        | "human" | "hitl" | "approval" ->
-            printfn "Running: Human-in-the-Loop Examples\n"
+        | "05" | "interactive" | "repl" ->
+            printfn "Running: 05-InteractiveSession\n"
+            do! runExample "InteractiveSession" Examples.InteractiveSession.runAll
+
+        | "06" | "human" | "hitl" ->
+            printfn "Running: 06-HumanInTheLoop\n"
             do! runExample "HumanInTheLoop" Examples.HumanInTheLoop.runAll
 
-        | "ask" | "askuser" | "clarify" ->
-            printfn "Running: Ask User Tool Examples\n"
-            do! runExample "AskUserTool" Examples.AskUserTool.runAll
+        | "07" | "events" ->
+            printfn "Running: 07-EventsExample\n"
+            do! runExample "EventsExample" Examples.EventsExample.runAll
+
+        | "08" | "budget" ->
+            printfn "Running: 08-MaxBudget\n"
+            do! runExample "MaxBudget" Examples.MaxBudget.runAll
+
+        | "09" | "structured" | "json" ->
+            printfn "Running: 09-StructuredOutput\n"
+            do! runExample "StructuredOutput" Examples.StructuredOutput.runAll
+
+        | "11" | "ask" | "askuser" ->
+            printfn "Running: 11-AskUserTool\n"
+            do! runExample "AskUserTool" Examples.AskUserTool.run
 
         | "all" | _ ->
             printfn "Running all examples...\n"
             printfn "Note: Examples that require Claude CLI will fail if not installed.\n"
 
-            do! runExample "SimpleQuery" Examples.SimpleQuery.runAll
+            do! runExample "01-QuickStart" Examples.QuickStart.run
             printfn "\n----------------------------------------\n"
 
-            do! runExample "InteractiveClient" Examples.InteractiveClient.runAll
+            do! runExample "02-StreamingBasic" Examples.StreamingBasic.runAll
             printfn "\n----------------------------------------\n"
 
-            do! runExample "McpTools" Examples.McpTools.runAll
+            do! runExample "03-McpTools" Examples.McpTools.runAll
             printfn "\n----------------------------------------\n"
 
-            do! runExample "HooksAndPermissions" Examples.HooksAndPermissions.runAll
+            do! runExample "04-HooksAndPermissions" Examples.HooksAndPermissions.runAll
             printfn "\n----------------------------------------\n"
 
-            do! runExample "HumanInTheLoop" Examples.HumanInTheLoop.runAll
+            do! runExample "05-InteractiveSession" Examples.InteractiveSession.runAll
             printfn "\n----------------------------------------\n"
 
-            do! runExample "AskUserTool" Examples.AskUserTool.runAll
+            do! runExample "06-HumanInTheLoop" Examples.HumanInTheLoop.runAll
+            printfn "\n----------------------------------------\n"
+
+            do! runExample "07-EventsExample" Examples.EventsExample.runAll
+            printfn "\n----------------------------------------\n"
+
+            do! runExample "08-MaxBudget" Examples.MaxBudget.runAll
+            printfn "\n----------------------------------------\n"
+
+            do! runExample "09-StructuredOutput" Examples.StructuredOutput.runAll
+            printfn "\n----------------------------------------\n"
+
+            do! runExample "11-AskUserTool" Examples.AskUserTool.run
 
         printfn "\n=================================="
         printfn "Examples completed."
@@ -75,4 +103,3 @@ let main args =
 
     run.GetAwaiter().GetResult()
     0
-

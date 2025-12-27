@@ -95,9 +95,16 @@ let buildArgs (options: Options) (isStreaming: bool) : string list =
     | Some (ToolsPresetConfig ClaudeCodeToolsPreset) ->
         args.AddRange(["--tools"; "default"])
 
-    // Allowed/disallowed tools
-    if not (List.isEmpty options.AllowedTools) then
-        args.AddRange(["--allowedTools"; String.Join(",", options.AllowedTools)])
+    // Allowed/disallowed tools with auto-allow support
+    let effectiveAllowedTools =
+        match options.ToolAllowMode with
+        | ManualControl -> options.AllowedTools
+        | AutoAllowMcp ->
+            let mcpTools = Options.enumerateMcpTools options.McpServers
+            List.distinct (mcpTools @ options.AllowedTools)
+
+    if not (List.isEmpty effectiveAllowedTools) then
+        args.AddRange(["--allowedTools"; String.Join(",", effectiveAllowedTools)])
 
     if not (List.isEmpty options.DisallowedTools) then
         args.AddRange(["--disallowedTools"; String.Join(",", options.DisallowedTools)])

@@ -27,11 +27,27 @@ module Schema =
     /// Boolean schema with description
     let bool' (desc: string) : Schema = SBool (Some desc)
 
-    /// Object schema with properties
-    let object' (props: (string * Schema * bool) list) : Schema = SObject props
+    /// Object schema with properties (no description)
+    let object' (props: (string * Schema * bool) list) : Schema = SObject (None, props)
 
-    /// Array schema
-    let array (itemSchema: Schema) : Schema = SArray itemSchema
+    /// Object schema with description and properties
+    let object'' (desc: string) (props: (string * Schema * bool) list) : Schema = SObject (Some desc, props)
+
+    /// Array schema (no description)
+    let array (itemSchema: Schema) : Schema = SArray (None, itemSchema)
+
+    /// Array schema with description
+    let array' (desc: string) (itemSchema: Schema) : Schema = SArray (Some desc, itemSchema)
+
+    /// Add or update description on any schema
+    let describe (desc: string) (schema: Schema) : Schema =
+        match schema with
+        | SString _ -> SString (Some desc)
+        | SNumber _ -> SNumber (Some desc)
+        | SBool _ -> SBool (Some desc)
+        | SObject (_, props) -> SObject (Some desc, props)
+        | SArray (_, items) -> SArray (Some desc, items)
+        | SAny -> SAny
 
     /// Any schema (no validation)
     let any : Schema = SAny

@@ -5,33 +5,34 @@ open FsUnit.Xunit
 open Thoth.Json.Net
 open ClaudeAgentSdk
 
-[<Fact>]
-let ``string schema encodes to JSON schema`` () =
-    let schema = Mcp.Schema.string
+// ============================================================================
+// Consolidated Primitive Schema Tests
+// ============================================================================
+
+[<Theory>]
+[<InlineData("string", "string")>]
+[<InlineData("number", "number")>]
+[<InlineData("bool", "boolean")>]
+let ``primitive schemas encode to JSON schema`` (schemaType: string) (expectedType: string) =
+    let schema =
+        match schemaType with
+        | "string" -> Mcp.Schema.string
+        | "number" -> Mcp.Schema.number
+        | "bool" -> Mcp.Schema.bool
+        | _ -> failwith "Invalid schema type"
+
     let json = Json.Encode.schema schema |> Encode.toString 0
-    json |> should equal """{"type":"string"}"""
+    json |> should equal (sprintf """{"type":"%s"}""" expectedType)
 
 [<Fact>]
-let ``string schema with description`` () =
+let ``schema with description includes description field`` () =
     let schema = Mcp.Schema.string' "A user's name"
     let json = Json.Encode.schema schema |> Encode.toString 0
     json |> should haveSubstring "\"type\":\"string\""
     json |> should haveSubstring "\"description\":\"A user's name\""
 
 [<Fact>]
-let ``number schema encodes correctly`` () =
-    let schema = Mcp.Schema.number
-    let json = Json.Encode.schema schema |> Encode.toString 0
-    json |> should equal """{"type":"number"}"""
-
-[<Fact>]
-let ``bool schema encodes correctly`` () =
-    let schema = Mcp.Schema.bool
-    let json = Json.Encode.schema schema |> Encode.toString 0
-    json |> should equal """{"type":"boolean"}"""
-
-[<Fact>]
-let ``array schema encodes correctly`` () =
+let ``array schema encodes with items`` () =
     let schema = Mcp.Schema.array Mcp.Schema.string
     let json = Json.Encode.schema schema |> Encode.toString 0
     json |> should haveSubstring "\"type\":\"array\""
@@ -51,7 +52,7 @@ let ``object schema with required and optional fields`` () =
     json |> should haveSubstring "\"required\":[\"name\"]"
 
 [<Fact>]
-let ``nested object schema`` () =
+let ``nested object schema encodes correctly`` () =
     let addressSchema = Mcp.Schema.object' [
         Mcp.Schema.required "street" Mcp.Schema.string
         Mcp.Schema.required "city" Mcp.Schema.string
@@ -70,4 +71,3 @@ let ``any schema encodes to empty object`` () =
     let schema = Mcp.Schema.any
     let json = Json.Encode.schema schema |> Encode.toString 0
     json |> should equal "{}"
-

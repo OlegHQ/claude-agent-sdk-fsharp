@@ -39,6 +39,11 @@ let connect (options: Options) : Task<Result<ClientContext, SdkError>> = taskRes
         HookCallbacks = hookCallbacks
     }
 
+    // Publish connection event
+    options.Events
+    |> Option.iter (fun bus ->
+        Events.EventBus.publish (ConnectionEstablished cliPath) bus)
+
     // Send initialize command if we have hooks
     do! Protocol.sendInitialize conn options
 
@@ -58,6 +63,12 @@ let send (prompt: string) (ctx: ClientContext) : Task<Result<ClientContext, SdkE
     let msg = Json.Encode.userMessage prompt ctx.SessionId
     let json = Encode.toString 0 msg
     do! Transport.write json ctx.Connection
+
+    // Publish message sent event
+    ctx.Options.Events
+    |> Option.iter (fun bus ->
+        Events.EventBus.publish (MessageSent(prompt, ctx.SessionId)) bus)
+
     return ctx
 }
 
@@ -89,6 +100,23 @@ let receive (ctx: ClientContext) : IAsyncEnumerable<Result<Message, SdkError>> =
                     yield Error e
 
                 | Ok (RegularMessage msg) ->
+                    // Publish message received event
+                    ctx.Options.Events
+                    |> Option.iter (fun bus ->
+                        Events.EventBus.publish (MessageReceived msg) bus
+
+                        // Detect and publish tool use events
+                        match msg with
+                        | AssistantMsg m ->
+                            for block in m.Content do
+                                match block with
+                                | ToolUse(id, name, input) ->
+                                    Events.EventBus.publish (ToolUseStarted(name, id, input)) bus
+                                | Thinking(content, _) ->
+                                    Events.EventBus.publish (ThinkingStarted content) bus
+                                | _ -> ()
+                        | _ -> ())
+
                     yield Ok msg
 
                     // Check for ResultMsg to stop the loop

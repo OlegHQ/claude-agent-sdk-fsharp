@@ -7,11 +7,13 @@
 
   <ItemGroup>
     <Compile Include="Types.fs" />
+    <Compile Include="Events.fs" />
     <Compile Include="Json.fs" />
     <Compile Include="Transport.fs" />
     <Compile Include="Parser.fs" />
     <Compile Include="Hooks.fs" />
     <Compile Include="Mcp.fs" />
+    <Compile Include="Streaming.fs" />
     <Compile Include="Protocol.fs" />
     <Compile Include="Query.fs" />
     <Compile Include="Client.fs" />

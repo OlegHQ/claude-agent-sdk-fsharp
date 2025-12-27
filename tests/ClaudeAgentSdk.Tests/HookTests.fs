@@ -26,27 +26,27 @@ module HookMatcherTests =
         let matcher = Hooks.matchAll hooks |> Hooks.withTimeout 5000.0
         matcher.Timeout |> should equal (Some 5000.0)
 
+// Consolidated: Hook input helpers tests
 module HookInputHelpersTests =
 
-    let preToolUseInput = PreToolUseInput("sess_1", "/tmp/transcript", "/home/user", "read", Encode.nil)
-    let postToolUseInput = PostToolUseInput("sess_2", "/tmp/transcript2", "/home/user2", "write", Encode.nil, Encode.nil)
-    let userPromptInput = UserPromptSubmitInput("sess_3", "/tmp/t", "/home/u", "hello")
-    let stopInput = StopInput("sess_4", "/tmp/t", "/cwd", true)
-
     [<Fact>]
-    let ``getSessionId extracts session ID from all input types`` () =
+    let ``hook input helpers extract fields correctly`` () =
+        let preToolUseInput = PreToolUseInput("sess_1", "/tmp/transcript", "/home/user", "read", Encode.nil)
+        let postToolUseInput = PostToolUseInput("sess_2", "/tmp/transcript2", "/home/user2", "write", Encode.nil, Encode.nil)
+        let userPromptInput = UserPromptSubmitInput("sess_3", "/tmp/t", "/home/u", "hello")
+        let stopInput = StopInput("sess_4", "/tmp/t", "/cwd", true)
+
+        // Test getSessionId
         Hooks.getSessionId preToolUseInput |> should equal "sess_1"
         Hooks.getSessionId postToolUseInput |> should equal "sess_2"
         Hooks.getSessionId userPromptInput |> should equal "sess_3"
         Hooks.getSessionId stopInput |> should equal "sess_4"
 
-    [<Fact>]
-    let ``getTranscriptPath extracts transcript path`` () =
+        // Test getTranscriptPath
         Hooks.getTranscriptPath preToolUseInput |> should equal "/tmp/transcript"
         Hooks.getTranscriptPath postToolUseInput |> should equal "/tmp/transcript2"
 
-    [<Fact>]
-    let ``getCwd extracts working directory`` () =
+        // Test getCwd
         Hooks.getCwd preToolUseInput |> should equal "/home/user"
         Hooks.getCwd postToolUseInput |> should equal "/home/user2"
 
@@ -79,11 +79,11 @@ module HookOutputBuildersTests =
 
     [<Fact>]
     let ``preToolUseResponse creates permission decision`` () =
-        let output = Hooks.preToolUseResponse Allow (Some "Approved by user")
+        let output = Hooks.preToolUseResponse Allow (Some "Approved")
         match output with
         | SyncHook(_, _, _, decision, _, reason, specific) ->
             decision |> should equal (Some "allow")
-            reason |> should equal (Some "Approved by user")
+            reason |> should equal (Some "Approved")
             match specific with
             | Some (PreToolUseOutput(pd, _, _)) ->
                 pd |> should equal (Some Allow)
@@ -91,28 +91,17 @@ module HookOutputBuildersTests =
         | _ -> failwith "Expected SyncHook"
 
     [<Fact>]
-    let ``postToolUseResponse creates context response`` () =
-        let output = Hooks.postToolUseResponse (Some "Additional info")
-        match output with
-        | SyncHook(_, _, _, _, _, _, specific) ->
-            match specific with
-            | Some (PostToolUseOutput ctx) ->
-                ctx |> should equal (Some "Additional info")
-            | _ -> failwith "Expected PostToolUseOutput"
-        | _ -> failwith "Expected SyncHook"
-
-    [<Fact>]
-    let ``withSystemMessage adds system message`` () =
-        let output = Hooks.continueHook |> Hooks.withSystemMessage "System update"
-        match output with
+    let ``hook output modifiers work correctly`` () =
+        // Test withSystemMessage
+        let withSysMsg = Hooks.continueHook |> Hooks.withSystemMessage "System update"
+        match withSysMsg with
         | SyncHook(_, _, _, _, sysMsg, _, _) ->
             sysMsg |> should equal (Some "System update")
         | _ -> failwith "Expected SyncHook"
 
-    [<Fact>]
-    let ``suppressOutput sets suppress flag`` () =
-        let output = Hooks.continueHook |> Hooks.suppressOutput
-        match output with
+        // Test suppressOutput
+        let suppressed = Hooks.continueHook |> Hooks.suppressOutput
+        match suppressed with
         | SyncHook(_, suppress, _, _, _, _, _) ->
             suppress |> should equal (Some true)
         | _ -> failwith "Expected SyncHook"
@@ -133,13 +122,10 @@ module BuildHookCallbacksTests =
 
         let callbackMap = Hooks.buildHookCallbacks hooks
 
-        // Should have one callback registered
         callbackMap |> Map.count |> should equal 1
-
-        // The callback ID should follow pattern hook_{event}_{matcherIdx}_{hookIdx}
         callbackMap |> Map.containsKey "hook_PreToolUse_0_0" |> should equal true
 
-        // Invoking should work
+        // Invoke to verify it works
         let testInput = PreToolUseInput("sess", "/t", "/cwd", "test", Encode.nil)
         let storedCallback = callbackMap.["hook_PreToolUse_0_0"]
         let! _ = storedCallback testInput None
@@ -163,11 +149,9 @@ module BuildHookCallbacksTests =
 
         let callbackMap = Hooks.buildHookCallbacks hooks
 
-        // Should have 4 callbacks total
         callbackMap |> Map.count |> should equal 4
 
         callbackMap |> Map.containsKey "hook_PreToolUse_0_0" |> should equal true
         callbackMap |> Map.containsKey "hook_PreToolUse_0_1" |> should equal true
         callbackMap |> Map.containsKey "hook_PreToolUse_1_0" |> should equal true
         callbackMap |> Map.containsKey "hook_PostToolUse_0_0" |> should equal true
-

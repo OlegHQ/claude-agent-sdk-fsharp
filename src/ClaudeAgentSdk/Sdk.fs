@@ -257,3 +257,45 @@ module Hooks =
     /// Suppress output in hook response
     let suppressOutput = Hooks.suppressOutput
 
+// ============================================================================
+// Event Bus
+// ============================================================================
+
+module Events =
+    /// Event types
+    type SdkEvent = SdkEvent
+    type EventHandler = EventHandler
+    type EventBus = EventBus
+
+    /// Create a new event bus
+    let createBus = Events.EventBus.create
+
+    /// Subscribe to events
+    let subscribe = Events.EventBus.subscribe
+
+    /// Unsubscribe from events
+    let unsubscribe = Events.EventBus.unsubscribe
+
+    /// Publish an event (internal use)
+    let publish = Events.EventBus.publish
+
+// ============================================================================
+// Streaming Helpers
+// ============================================================================
+
+module Streaming =
+    /// Iterate with side effects
+    let forEach = Streaming.forEach
+
+    /// Iterate until condition is false
+    let forEachWhile = Streaming.forEachWhile
+
+    /// Collect all messages and errors
+    let collect = Streaming.collect
+
+    /// Filter messages by predicate
+    let filterMessages = Streaming.filterMessages
+
+    /// Take messages until result
+    let takeUntilResult = Streaming.takeUntilResult
+
