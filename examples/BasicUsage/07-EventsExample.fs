@@ -1,12 +1,11 @@
 /// Example 07: Event System - Subscribe to SDK events
 module Examples.EventsExample
 
-open System
 open ClaudeAgentSdk
 open Examples.Common
 
 let basicEvents () = task {
-    UI.banner "Events - Basic Event Subscription"
+    TUI.banner "Events - Basic Event Subscription"
 
     let logger = Logger.normal
 
@@ -47,13 +46,11 @@ let basicEvents () = task {
     | Error e ->
         logError e
 
-    printfn ""
+    TUI.blank ()
 }
 
 let multipleSubscribers () = task {
-    UI.banner "Events - Multiple Subscribers"
-
-    let logger = Logger.normal
+    TUI.banner "Events - Multiple Subscribers"
 
     let bus = Events.createBus ()
 
@@ -76,7 +73,7 @@ let multipleSubscribers () = task {
         match event with
         | ThinkingStarted content ->
             let preview = if content.Length > 50 then content.[..49] else content
-            printfn "[THINKING] %s" preview
+            TUI.textLn (sprintf "[THINKING] %s" preview)
         | _ -> ()
 
     let _sub1 = Events.subscribe handler1 bus
@@ -98,11 +95,11 @@ let multipleSubscribers () = task {
     | Error e ->
         logError e
 
-    printfn ""
+    TUI.blank ()
 }
 
 let unsubscribeExample () = task {
-    UI.banner "Events - Unsubscribe"
+    TUI.banner "Events - Unsubscribe"
 
     let logger = Logger.normal
 
@@ -140,13 +137,13 @@ let unsubscribeExample () = task {
     | Error e ->
         logError e
 
-    printfn ""
+    TUI.blank ()
 }
 
 let runAll () = task {
     do! basicEvents ()
-    UI.separator ()
+    TUI.separator ()
     do! multipleSubscribers ()
-    UI.separator ()
+    TUI.separator ()
     do! unsubscribeExample ()
 }

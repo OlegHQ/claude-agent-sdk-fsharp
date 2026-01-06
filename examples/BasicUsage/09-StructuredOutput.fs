@@ -1,13 +1,12 @@
 /// Example 09: Structured Output - JSON Schema output format
 module Examples.StructuredOutput
 
-open System
 open ClaudeAgentSdk
 open Thoth.Json.Net
 open Examples.Common
 
 let basicStructured () = task {
-    UI.banner "Structured Output - JSON Schema"
+    TUI.banner "Structured Output - JSON Schema"
 
     // Define output schema
     let schema = Mcp.Schema.object' [
@@ -22,27 +21,25 @@ let basicStructured () = task {
     }
 
     info "Requesting structured output (JSON)..."
-    printfn ""
+    TUI.blank ()
 
     let! result = queryStructured "What is 15% of 80? Show your work." options
 
     match result with
     | Ok (Some json) ->
         success "Structured output received:"
-        printfn ""
-        Console.ForegroundColor <- ConsoleColor.Green
-        printfn "%s" (Encode.toString 2 json)
-        Console.ResetColor()
+        TUI.blank ()
+        TUI.greenLn (Encode.toString 2 json)
     | Ok None ->
         warn "No structured output received"
     | Error e ->
         logError e
 
-    printfn ""
+    TUI.blank ()
 }
 
 let complexSchema () = task {
-    UI.banner "Structured Output - Complex Schema"
+    TUI.banner "Structured Output - Complex Schema"
 
     // Complex nested schema
     let personSchema = Mcp.Schema.object'' "A person" [
@@ -62,27 +59,25 @@ let complexSchema () = task {
     }
 
     info "Requesting complex structured output..."
-    printfn ""
+    TUI.blank ()
 
     let! result = queryStructured "Create data for 3 fictional people (name, age, email)" options
 
     match result with
     | Ok (Some json) ->
         success "Complex structured output:"
-        printfn ""
-        Console.ForegroundColor <- ConsoleColor.Cyan
-        printfn "%s" (Encode.toString 2 json)
-        Console.ResetColor()
+        TUI.blank ()
+        TUI.cyanLn (Encode.toString 2 json)
     | Ok None ->
         warn "No output"
     | Error e ->
         logError e
 
-    printfn ""
+    TUI.blank ()
 }
 
 let runAll () = task {
     do! basicStructured ()
-    UI.separator ()
+    TUI.separator ()
     do! complexSchema ()
 }

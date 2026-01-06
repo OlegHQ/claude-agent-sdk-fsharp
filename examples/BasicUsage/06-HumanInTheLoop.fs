@@ -14,86 +14,73 @@ open Examples.Common
 /// Prompt user for approval before each tool use
 let interactiveApproval: string -> JsonValue -> PermissionContext -> System.Threading.Tasks.Task<PermissionResult> =
     fun toolName input ctx -> task {
-        Console.WriteLine()
-        Console.ForegroundColor <- ConsoleColor.Yellow
-        Console.WriteLine("═══════════════════════════════════════════════════════")
-        Console.WriteLine("  TOOL APPROVAL REQUEST")
-        Console.WriteLine("═══════════════════════════════════════════════════════")
-        Console.ResetColor()
-
-        Console.WriteLine($"  Tool: {toolName}")
-        Console.WriteLine($"  Input:")
+        TUI.blank ()
+        TUI.approvalBox
+            "TOOL APPROVAL REQUEST"
+            [
+                sprintf "Tool: %s" toolName
+                "Input:"
+            ]
+            ""
 
         // Pretty print the input
         let inputStr = Encode.toString 2 input
         for line in inputStr.Split('\n') do
-            Console.WriteLine($"    {line}")
+            TUI.indentLn 4 line
 
-        Console.WriteLine()
+        TUI.blank ()
 
         // Show suggestions if any
         if not (List.isEmpty ctx.Suggestions) then
-            Console.ForegroundColor <- ConsoleColor.Cyan
-            Console.WriteLine("  Suggested permissions:")
+            TUI.cyanLn "  Suggested permissions:"
             for suggestion in ctx.Suggestions do
-                Console.WriteLine($"    - {suggestion.Type}")
-            Console.ResetColor()
-            Console.WriteLine()
+                TUI.textLn (sprintf "    - %A" suggestion.Type)
+            TUI.blank ()
 
         // Prompt for decision
-        Console.ForegroundColor <- ConsoleColor.Green
-        Console.Write("  [A]llow / [D]eny / [M]odify input? ")
-        Console.ResetColor()
+        TUI.green "  "
+        TUI.promptOptions ["A"; "D"; "M"]
 
-        let key = Console.ReadKey(true)
-        Console.WriteLine(key.KeyChar)
+        let key = TUI.readKeyChar ()
+        TUI.textLn (string key)
 
-        match Char.ToLower(key.KeyChar) with
+        match Char.ToLower(key) with
         | 'a' ->
-            Console.ForegroundColor <- ConsoleColor.Green
-            Console.WriteLine("  ✓ Approved")
-            Console.ResetColor()
-            debug $"User approved tool: {toolName}"
+            TUI.greenLn "  OK Approved"
+            debug (sprintf "User approved tool: %s" toolName)
             return PermitAllow(None, None)
 
         | 'd' ->
-            Console.Write("  Reason (optional): ")
-            let reason = Console.ReadLine()
+            TUI.text "  Reason (optional): "
+            let reason = TUI.readLine ()
             let reason = if String.IsNullOrWhiteSpace(reason) then "Denied by user" else reason
 
-            Console.Write("  Interrupt session? [y/N]: ")
-            let interrupt = Console.ReadKey(true).KeyChar |> Char.ToLower = 'y'
-            Console.WriteLine()
+            TUI.text "  Interrupt session? "
+            TUI.promptYN false
+            let interrupt = Char.ToLower(TUI.readKeyChar ()) = 'y'
+            TUI.blank ()
 
-            Console.ForegroundColor <- ConsoleColor.Red
-            Console.WriteLine($"  ✗ Denied: {reason}")
-            Console.ResetColor()
-            warn $"User denied tool: {toolName} - {reason}"
+            TUI.redLn (sprintf "  X Denied: %s" reason)
+            warn (sprintf "User denied tool: %s - %s" toolName reason)
             return PermitDeny(reason, interrupt)
 
         | 'm' ->
-            Console.WriteLine("  Enter modified input (JSON):")
-            Console.Write("  > ")
-            let modifiedJson = Console.ReadLine()
+            TUI.textLn "  Enter modified input (JSON):"
+            TUI.text "  > "
+            let modifiedJson = TUI.readLine ()
 
             match Decode.fromString Decode.value modifiedJson with
             | Ok newInput ->
-                Console.ForegroundColor <- ConsoleColor.Green
-                Console.WriteLine("  ✓ Approved with modified input")
-                Console.ResetColor()
-                debug $"User modified and approved tool: {toolName}"
+                TUI.greenLn "  OK Approved with modified input"
+                debug (sprintf "User modified and approved tool: %s" toolName)
                 return PermitAllow(Some newInput, None)
             | Error e ->
-                Console.ForegroundColor <- ConsoleColor.Red
-                Console.WriteLine($"  Invalid JSON: {e}")
-                Console.WriteLine("  Falling back to original input...")
-                Console.ResetColor()
+                TUI.redLn (sprintf "  Invalid JSON: %s" e)
+                TUI.textLn "  Falling back to original input..."
                 return PermitAllow(None, None)
 
         | _ ->
-            Console.ForegroundColor <- ConsoleColor.Gray
-            Console.WriteLine("  (defaulting to Allow)")
-            Console.ResetColor()
+            TUI.grayLn "  (defaulting to Allow)"
             return PermitAllow(None, None)
     }
 
@@ -107,10 +94,8 @@ let smartApproval: string -> JsonValue -> PermissionContext -> System.Threading.
             | _ -> false
 
         if safeTool then
-            Console.ForegroundColor <- ConsoleColor.DarkGray
-            Console.WriteLine($"  [Auto-approved: {toolName}]")
-            Console.ResetColor()
-            debug $"Auto-approved safe tool: {toolName}"
+            TUI.darkGrayLn (sprintf "  [Auto-approved: %s]" toolName)
+            debug (sprintf "Auto-approved safe tool: %s" toolName)
             return PermitAllow(None, None)
         else
             // For other tools, ask user
@@ -126,10 +111,8 @@ let reviewResultsHook: HookCallback =
     fun input toolUseId -> task {
         match input with
         | PostToolUseInput(_, _, _, toolName, _, response) ->
-            Console.WriteLine()
-            Console.ForegroundColor <- ConsoleColor.Cyan
-            Console.WriteLine($"  Tool '{toolName}' completed.")
-            Console.ResetColor()
+            TUI.blank ()
+            TUI.cyanLn (sprintf "  Tool '%s' completed." toolName)
 
             let responseStr = Encode.toString 2 response
             let preview =
@@ -138,18 +121,19 @@ let reviewResultsHook: HookCallback =
                 else
                     responseStr
 
-            Console.WriteLine("  Result:")
+            TUI.textLn "  Result:"
             for line in preview.Split('\n') do
-                Console.WriteLine($"    {line}")
+                TUI.indentLn 4 line
 
-            Console.Write("  Continue? [Y/n]: ")
-            let key = Console.ReadKey(true)
-            Console.WriteLine()
+            TUI.text "  Continue? "
+            TUI.promptYN true
+            let key = TUI.readKeyChar ()
+            TUI.blank ()
 
-            if Char.ToLower(key.KeyChar) = 'n' then
-                Console.Write("  Reason: ")
-                let reason = Console.ReadLine()
-                warn $"User stopped after tool: {toolName}"
+            if Char.ToLower(key) = 'n' then
+                TUI.text "  Reason: "
+                let reason = TUI.readLine ()
+                warn (sprintf "User stopped after tool: %s" toolName)
                 return Hooks.blockHook (if String.IsNullOrWhiteSpace(reason) then "Stopped by user" else reason)
             else
                 return Hooks.continueHook
@@ -163,18 +147,17 @@ let addContextHook: HookCallback =
     fun input toolUseId -> task {
         match input with
         | PreToolUseInput(_, _, _, toolName, _) ->
-            Console.WriteLine()
-            Console.ForegroundColor <- ConsoleColor.Magenta
-            Console.Write($"  Add context for '{toolName}'? [y/N]: ")
-            Console.ResetColor()
+            TUI.blank ()
+            TUI.magenta (sprintf "  Add context for '%s'? " toolName)
+            TUI.promptYN false
 
-            let key = Console.ReadKey(true)
-            Console.WriteLine()
+            let key = TUI.readKeyChar ()
+            TUI.blank ()
 
-            if Char.ToLower(key.KeyChar) = 'y' then
-                Console.Write("  Context: ")
-                let context = Console.ReadLine()
-                debug $"User added context: {context}"
+            if Char.ToLower(key) = 'y' then
+                TUI.text "  Context: "
+                let context = TUI.readLine ()
+                debug (sprintf "User added context: %s" context)
                 return Hooks.continueHook |> Hooks.withSystemMessage context
             else
                 return Hooks.continueHook
@@ -189,16 +172,12 @@ let addContextHook: HookCallback =
 
 /// Run an interactive session with human approval
 let interactiveSession () = task {
-    Console.Clear()
-    Console.ForegroundColor <- ConsoleColor.Cyan
-    Console.WriteLine("╔═══════════════════════════════════════════════════════════╗")
-    Console.WriteLine("║     CLAUDE AGENT SDK - Human-in-the-Loop Demo             ║")
-    Console.WriteLine("╠═══════════════════════════════════════════════════════════╣")
-    Console.WriteLine("║  You will be prompted before Claude executes any tool.    ║")
-    Console.WriteLine("║  Press A to allow, D to deny, M to modify input.          ║")
-    Console.WriteLine("╚═══════════════════════════════════════════════════════════╝")
-    Console.ResetColor()
-    Console.WriteLine()
+    TUI.clear ()
+    TUI.box "CLAUDE AGENT SDK - Human-in-the-Loop Demo" [
+        "You will be prompted before Claude executes any tool."
+        "Press A to allow, D to deny, M to modify input."
+    ]
+    TUI.blank ()
 
     // Configure with human-in-the-loop approval
     let hooks = Map.ofList [
@@ -223,53 +202,47 @@ let interactiveSession () = task {
     | Ok ctx ->
         // Recursive interactive loop (no mutable state)
         let rec loop ctx = task {
-            Console.ForegroundColor <- ConsoleColor.White
-            Console.Write("You> ")
-            Console.ResetColor()
+            TUI.prompt "You"
 
-            let prompt = Console.ReadLine()
+            let prompt = TUI.readLine ()
 
             match prompt with
             | null | "" ->
                 return ()
             | prompt ->
-                Console.WriteLine()
+                TUI.blank ()
                 info (sprintf "Sending: %s" prompt)
 
                 let! result = verboseClientQuery prompt ctx
                 match result with
                 | Ok (newCtx, messages) ->
-                    Console.WriteLine()
-                    Console.ForegroundColor <- ConsoleColor.Blue
-                    Console.WriteLine("Claude:")
-                    Console.ResetColor()
+                    TUI.blank ()
+                    TUI.blueLn "Claude:"
 
                     for text in Client.getAssistantText messages do
-                        Console.WriteLine(sprintf "  %s" text)
+                        TUI.indentLn 2 text
 
                     // Show any tool uses
                     let toolUses = Client.getToolUses messages
                     if not (List.isEmpty toolUses) then
-                        Console.ForegroundColor <- ConsoleColor.DarkGray
-                        Console.WriteLine(sprintf "  [Used %d tool(s)]" (List.length toolUses))
-                        Console.ResetColor()
+                        TUI.darkGrayLn (sprintf "  [Used %d tool(s)]" (List.length toolUses))
 
-                    Console.WriteLine()
+                    TUI.blank ()
 
                     return! loop newCtx
 
                 | Error e ->
                     logError e
-                    Console.WriteLine()
+                    TUI.blank ()
                     return! loop ctx
         }
 
         try
-            Console.WriteLine("Connected to Claude. Enter prompts (empty to quit):")
-            Console.WriteLine()
+            TUI.textLn "Connected to Claude. Enter prompts (empty to quit):"
+            TUI.blank ()
             do! loop ctx
 
-            Console.WriteLine("Session ended.")
+            TUI.textLn "Session ended."
 
         finally
             info "Disconnecting..."
@@ -278,11 +251,11 @@ let interactiveSession () = task {
 
 /// Demo with smart approval (auto-approve safe tools)
 let smartApprovalSession () = task {
-    printfn ""
-    printfn "=== Smart Approval Demo ==="
-    printfn "Safe tools (Read, Glob, Grep, LS) are auto-approved."
-    printfn "Other tools require manual approval."
-    printfn ""
+    TUI.blank ()
+    TUI.banner "Smart Approval Demo"
+    TUI.textLn "Safe tools (Read, Glob, Grep, LS) are auto-approved."
+    TUI.textLn "Other tools require manual approval."
+    TUI.blank ()
 
     let options = {
         Options.defaults with
@@ -306,12 +279,10 @@ let smartApprovalSession () = task {
 
             match result with
             | Ok (_, messages) ->
-                Console.WriteLine()
-                Console.ForegroundColor <- ConsoleColor.Blue
-                Console.WriteLine("Claude:")
-                Console.ResetColor()
+                TUI.blank ()
+                TUI.blueLn "Claude:"
                 for text in Client.getAssistantText messages do
-                    Console.WriteLine($"  {text}")
+                    TUI.indentLn 2 text
             | Error e ->
                 logError e
 
@@ -323,13 +294,11 @@ let smartApprovalSession () = task {
 /// Run all human-in-the-loop examples
 let runAll () = task {
     info "Starting Human-in-the-Loop examples..."
-    printfn ""
+    TUI.blank ()
 
-    printfn "Human-in-the-Loop Examples"
-    printfn "=========================="
-    printfn ""
-    printfn "This example demonstrates interactive approval for tool execution."
-    printfn ""
+    TUI.banner "Human-in-the-Loop Examples"
+    TUI.textLn "This example demonstrates interactive approval for tool execution."
+    TUI.blank ()
 
     // Show how to configure
     info "Configuration for interactive approval:"
@@ -349,12 +318,12 @@ let runAll () = task {
     - Supports modifying tool input before execution
     """
 
-    printfn ""
+    TUI.blank ()
 
     // Demo the approval callback directly
     info "Testing the approval callback directly:"
     info "(Press A to allow, D to deny, or M to modify)"
-    printfn ""
+    TUI.blank ()
 
     let testInput = Encode.object [
         "command", Encode.string "echo 'Hello World'"
@@ -365,19 +334,19 @@ let runAll () = task {
     match result with
     | PermitAllow(modified, _) ->
         match modified with
-        | Some m -> success $"Result: Allowed with modified input: {Encode.toString 0 m}"
+        | Some m -> success (sprintf "Result: Allowed with modified input: %s" (Encode.toString 0 m))
         | None -> success "Result: Allowed"
     | PermitDeny(msg, interrupt) ->
-        warn $"Result: Denied - {msg} (interrupt: {interrupt})"
+        warn (sprintf "Result: Denied - %s (interrupt: %b)" msg interrupt)
 
-    printfn ""
+    TUI.blank ()
 
     // Run smart approval demo with actual Claude
     do! smartApprovalSession ()
 
-    printfn ""
+    TUI.blank ()
     success "Human-in-the-Loop examples completed!"
-    printfn ""
+    TUI.blank ()
     info "To run the full interactive session:"
     info "  do! Examples.HumanInTheLoop.interactiveSession ()"
 }

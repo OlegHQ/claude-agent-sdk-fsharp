@@ -1,12 +1,11 @@
 /// Example 08: Budget Control - Limit costs with MaxBudgetUsd
 module Examples.MaxBudget
 
-open System
 open ClaudeAgentSdk
 open Examples.Common
 
 let basicBudget () = task {
-    UI.banner "Budget Control - MaxBudgetUsd"
+    TUI.banner "Budget Control - MaxBudgetUsd"
 
     let options = {
         Options.defaults with
@@ -16,7 +15,7 @@ let basicBudget () = task {
 
     info "Budget limit: $0.05"
     info "Max turns: 3"
-    printfn ""
+    TUI.blank ()
 
     let! result = queryCollect "Write a detailed essay about artificial intelligence" options
 
@@ -40,11 +39,11 @@ let basicBudget () = task {
     | Error e ->
         logError e
 
-    printfn ""
+    TUI.blank ()
 }
 
 let compareModels () = task {
-    UI.banner "Budget Control - Compare Models"
+    TUI.banner "Budget Control - Compare Models"
 
     let prompt = "What is recursion?"
 
@@ -69,7 +68,7 @@ let compareModels () = task {
     | Error e ->
         logError e
 
-    printfn ""
+    TUI.blank ()
 
     // Sonnet (more expensive)
     info "Running with Sonnet..."
@@ -92,11 +91,11 @@ let compareModels () = task {
     | Error e ->
         logError e
 
-    printfn ""
+    TUI.blank ()
 }
 
 let runAll () = task {
     do! basicBudget ()
-    UI.separator ()
+    TUI.separator ()
     do! compareModels ()
 }

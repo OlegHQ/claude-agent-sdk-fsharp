@@ -12,8 +12,8 @@ open Examples.Common
 // ============================================================================
 
 let rec interactiveLoop (ctx: ClientContext) (logger: Logger) = task {
-    printf "You> "
-    let prompt = Console.ReadLine()
+    TUI.prompt "You"
+    let prompt = TUI.readLine ()
 
     match prompt with
     | null | "" | "exit" | "quit" ->
@@ -21,17 +21,17 @@ let rec interactiveLoop (ctx: ClientContext) (logger: Logger) = task {
         return ()
 
     | "/help" ->
-        printfn ""
-        printfn "Commands:"
-        printfn "  exit, quit  - Exit the session"
-        printfn "  /help       - Show this help"
-        printfn "  /clear      - Clear screen"
-        printfn "  <text>      - Send message to Claude"
-        printfn ""
+        TUI.blank ()
+        TUI.textLn "Commands:"
+        TUI.textLn "  exit, quit  - Exit the session"
+        TUI.textLn "  /help       - Show this help"
+        TUI.textLn "  /clear      - Clear screen"
+        TUI.textLn "  <text>      - Send message to Claude"
+        TUI.blank ()
         return! interactiveLoop ctx logger
 
     | "/clear" ->
-        Console.Clear()
+        TUI.clear ()
         return! interactiveLoop ctx logger
 
     | prompt ->
@@ -53,9 +53,9 @@ let rec interactiveLoop (ctx: ClientContext) (logger: Logger) = task {
             | Ok messages ->
                 // Display assistant text
                 for text in Client.getAssistantText messages do
-                    Console.ForegroundColor <- ConsoleColor.White
-                    printfn "\n%s\n" text
-                    Console.ResetColor()
+                    TUI.blank ()
+                    TUI.whiteLn text
+                    TUI.blank ()
 
                 return! interactiveLoop ctx logger
 
@@ -69,7 +69,7 @@ let rec interactiveLoop (ctx: ClientContext) (logger: Logger) = task {
 // ============================================================================
 
 let basicSession () = task {
-    UI.banner "Interactive Session - Basic REPL"
+    TUI.banner "Interactive Session - Basic REPL"
 
     let logger = Logger.normal
 
@@ -85,15 +85,15 @@ let basicSession () = task {
         logError e
     | Ok ctx ->
         try
-            printfn "Connected! Type your messages (type 'exit' to quit):"
-            printfn ""
+            TUI.textLn "Connected! Type your messages (type 'exit' to quit):"
+            TUI.blank ()
             do! interactiveLoop ctx logger
         finally
             Client.disconnect ctx |> Async.AwaitTask |> Async.RunSynchronously
 }
 
 let withEvents () = task {
-    UI.banner "Interactive Session - With Event Logging"
+    TUI.banner "Interactive Session - With Event Logging"
 
     let logger = Logger.verbose
 
@@ -125,9 +125,9 @@ let withEvents () = task {
         logError e
     | Ok ctx ->
         try
-            printfn "Connected with event logging!"
-            printfn "Try: What is the capital of France?"
-            printfn ""
+            TUI.textLn "Connected with event logging!"
+            TUI.textLn "Try: What is the capital of France?"
+            TUI.blank ()
             do! interactiveLoop ctx logger
         finally
             Client.disconnect ctx |> Async.AwaitTask |> Async.RunSynchronously
@@ -135,12 +135,12 @@ let withEvents () = task {
 
 let runAll () = task {
     do! basicSession ()
-    printfn ""
-    UI.separator ()
-    printfn ""
+    TUI.blank ()
+    TUI.separator ()
+    TUI.blank ()
 
-    printfn "Press Enter to try with event logging..."
-    Console.ReadLine() |> ignore
+    TUI.textLn "Press Enter to try with event logging..."
+    TUI.readLine () |> ignore
 
     do! withEvents ()
 }

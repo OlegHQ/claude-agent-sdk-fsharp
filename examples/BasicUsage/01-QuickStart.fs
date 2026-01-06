@@ -1,12 +1,11 @@
 /// Example 01: Quick Start - Simplest possible query
 module Examples.QuickStart
 
-open System
 open ClaudeAgentSdk
 open Examples.Common
 
 let run () = task {
-    UI.banner "Quick Start - Basic Query"
+    TUI.banner "Quick Start - Basic Query"
 
     info "Sending a simple query to Claude..."
 
@@ -15,17 +14,15 @@ let run () = task {
     match result with
     | Ok messages ->
         success "Query completed!"
-        printfn ""
+        TUI.blank ()
 
         // Extract assistant text
         let texts = Client.getAssistantText messages
         for text in texts do
-            Console.ForegroundColor <- ConsoleColor.Green
-            printfn "Answer: %s" text
-            Console.ResetColor()
+            TUI.greenLn (sprintf "Answer: %s" text)
 
     | Error e ->
         logError e
 
-    printfn ""
+    TUI.blank ()
 }

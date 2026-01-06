@@ -1,16 +1,15 @@
 /// Example 02: Streaming Basics - TaskSeq patterns without mutable state
 module Examples.StreamingBasic
 
-open System
 open FSharp.Control
 open ClaudeAgentSdk
 open Examples.Common
 
 let streamingQuery () = task {
-    UI.banner "Streaming Query - Real-time Output"
+    TUI.banner "Streaming Query - Real-time Output"
 
     info "Streaming: 'Write a haiku about F#'..."
-    printfn ""
+    TUI.blank ()
 
     // Pattern 1: Direct iteration with for loop (no mutable state!)
     for result in query "Write a haiku about F#" Options.defaults do
@@ -20,22 +19,19 @@ let streamingQuery () = task {
             | AssistantMsg m ->
                 for block in m.Content do
                     match block with
-                    | Text t ->
-                        Console.ForegroundColor <- ConsoleColor.White
-                        printf "%s" t
-                        Console.ResetColor()
+                    | Text t -> TUI.white t
                     | _ -> ()
             | ResultMsg r ->
-                printfn ""
+                TUI.blank ()
                 success (sprintf "Done! %d turns" r.NumTurns)
             | _ -> ()
         | Error e -> logError e
 
-    printfn ""
+    TUI.blank ()
 }
 
 let collectStream () = task {
-    UI.banner "Collect Stream - Gather All Messages"
+    TUI.banner "Collect Stream - Gather All Messages"
 
     info "Collecting stream into list..."
 
@@ -47,11 +43,11 @@ let collectStream () = task {
 
     success (sprintf "Collected %d messages" (List.length messages))
 
-    printfn ""
+    TUI.blank ()
 }
 
 let foldStream () = task {
-    UI.banner "Fold Stream - Count Messages"
+    TUI.banner "Fold Stream - Count Messages"
 
     // Pattern 3: Fold over stream (pure functional)
     let! messageCount =
@@ -64,11 +60,11 @@ let foldStream () = task {
 
     info (sprintf "Assistant sent %d messages" messageCount)
 
-    printfn ""
+    TUI.blank ()
 }
 
 let customOptions () = task {
-    UI.banner "Custom Options - Model, Prompt, Budget"
+    TUI.banner "Custom Options - Model, Prompt, Budget"
 
     let options = {
         Options.defaults with
@@ -88,19 +84,19 @@ let customOptions () = task {
     match result with
     | Ok messages ->
         for text in Client.getAssistantText messages do
-            Console.ForegroundColor <- ConsoleColor.Cyan
-            printfn "\n%s\n" text
-            Console.ResetColor()
+            TUI.blank ()
+            TUI.cyanLn text
+            TUI.blank ()
     | Error e ->
         logError e
 }
 
 let runAll () = task {
     do! streamingQuery ()
-    UI.separator ()
+    TUI.separator ()
     do! collectStream ()
-    UI.separator ()
+    TUI.separator ()
     do! foldStream ()
-    UI.separator ()
+    TUI.separator ()
     do! customOptions ()
 }

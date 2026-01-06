@@ -1,7 +1,6 @@
 /// Example 03: MCP Tools - Create and use custom tools
 module Examples.McpTools
 
-open System
 open System.Threading.Tasks
 open ClaudeAgentSdk
 open Examples.Common
@@ -17,7 +16,7 @@ let createGreetTool () =
 
     Mcp.tool "greet" "Greet a person by name" schema (fun input -> task {
         match Mcp.getString "name" input with
-        | Ok name -> return Mcp.textResult $"Hello, {name}! Nice to meet you!"
+        | Ok name -> return Mcp.textResult (sprintf "Hello, %s! Nice to meet you!" name)
         | Error e -> return Mcp.errorResult e
     })
 
@@ -53,7 +52,7 @@ let createWeatherTool () =
             // Mock weather data
             let temp = 15 + (city.Length % 20)
             let conditions = ["Sunny"; "Cloudy"; "Rainy"; "Snowy"].[city.Length % 4]
-            return Mcp.textResult $"Weather in {city}: {temp}°C, {conditions}"
+            return Mcp.textResult (sprintf "Weather in %s: %d C, %s" city temp conditions)
         | Error e ->
             return Mcp.errorResult e
     })
@@ -68,7 +67,7 @@ let createSearchTool () =
         match Mcp.getString "query" input with
         | Ok query ->
             let limit = Mcp.tryGetInt "limit" input |> Option.defaultValue 3
-            let results = [1..limit] |> List.map (fun i -> $"Result {i} for '{query}'")
+            let results = [1..limit] |> List.map (fun i -> sprintf "Result %d for '%s'" i query)
             return Mcp.textResult (String.concat "\n" results)
         | Error e ->
             return Mcp.errorResult e
@@ -87,7 +86,7 @@ let createExampleServer () =
 // ============================================================================
 
 let directToolTest () = task {
-    UI.banner "MCP Tools - Direct Testing"
+    TUI.banner "MCP Tools - Direct Testing"
 
     let logger = Logger.normal
 
@@ -100,12 +99,12 @@ let directToolTest () = task {
     | ToolSuccess content ->
         for c in content do
             match c with
-            | TextContent t -> printfn "  %s" t
+            | TextContent t -> TUI.indentLn 2 t
             | _ -> ()
     | ToolFailure e ->
-        Logger.error $"Error: {e}" logger
+        Logger.error (sprintf "Error: %s" e) logger
 
-    printfn ""
+    TUI.blank ()
 
     Logger.info "Testing calculator tool..." logger
     let! calcResult = calc.Handler (Thoth.Json.Net.Encode.object [
@@ -117,16 +116,16 @@ let directToolTest () = task {
     | ToolSuccess content ->
         for c in content do
             match c with
-            | TextContent t -> printfn "  %s" t
+            | TextContent t -> TUI.indentLn 2 t
             | _ -> ()
     | ToolFailure e ->
-        Logger.error $"Error: {e}" logger
+        Logger.error (sprintf "Error: %s" e) logger
 
-    printfn ""
+    TUI.blank ()
 }
 
 let withClaude () = task {
-    UI.banner "MCP Tools - With Claude (Auto-Allow)"
+    TUI.banner "MCP Tools - With Claude (Auto-Allow)"
 
     let logger = Logger.normal
 
@@ -145,10 +144,10 @@ let withClaude () = task {
     match server with
     | SdkServer(_, tools) ->
         for tool in tools do
-            Logger.debug $"  - {tool.Name}: {tool.Description}" logger
+            Logger.debug (sprintf "  - %s: %s" tool.Name tool.Description) logger
     | _ -> ()
 
-    printfn ""
+    TUI.blank ()
 
     let! connectResult = Client.connect options
 
@@ -165,11 +164,11 @@ let withClaude () = task {
                 let! result = Stream.streamWithDisplay logger (Client.receive ctx)
                 match result with
                 | Ok messages ->
-                    printfn ""
+                    TUI.blank ()
                     for text in Client.getAssistantText messages do
-                        Console.ForegroundColor <- ConsoleColor.Cyan
-                        printfn "\n%s\n" text
-                        Console.ResetColor()
+                        TUI.blank ()
+                        TUI.cyanLn text
+                        TUI.blank ()
                 | Error e ->
                     logError e
             | Error e ->
@@ -180,6 +179,6 @@ let withClaude () = task {
 
 let runAll () = task {
     do! directToolTest ()
-    UI.separator ()
+    TUI.separator ()
     do! withClaude ()
 }
