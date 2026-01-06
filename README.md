@@ -7,6 +7,28 @@ Idiomatic F# port of the Claude Agent SDK with 100% feature parity. Embraces alg
 - .NET 8.0 or later
 - Claude CLI installed (for running examples)
 
+## Installation (Paket)
+
+Add to your `paket.dependencies`:
+
+```
+git https://github.com/snowbear/claude-agent-sdk-fsharp.git master build: "dotnet build src/ClaudeAgentSdk -c Release"
+```
+
+Add to your `paket.references`:
+
+```
+ClaudeAgentSdk
+```
+
+Then run:
+
+```bash
+paket install
+```
+
+> NuGet package coming soon.
+
 ## Quick Start
 
 ```fsharp
