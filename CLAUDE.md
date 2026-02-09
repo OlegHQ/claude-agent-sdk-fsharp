@@ -27,6 +27,12 @@ src/
 └── Sdk.fs         # Public API
 ```
 
+## CI
+
+- Workflow: `.github/workflows/ci.yml` (Continuous Integration).
+- Triggers: `workflow_dispatch`, `pull_request`, and `push` to the default branch (currently `dev`).
+- Runs on `ubuntu-latest`, restores/builds SDK + examples, runs tests, and publishes TRX results via `EnricoMi/publish-unit-test-result-action` pinned to a commit SHA (reporting skipped for fork PRs).
+
 ## Types - Algebraic, Not Classes
 
 ```fsharp
